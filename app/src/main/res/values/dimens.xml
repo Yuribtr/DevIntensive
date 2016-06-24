@@ -30,6 +30,8 @@
     <dimen name="spacing_vertical_toolbar">56dp</dimen>
     <dimen name="spacing_vertical_subtitle">48dp</dimen>
     <dimen name="spacing_vertical_listitem">72dp</dimen>
+    <dimen name="size_big_72">72dp</dimen>
+    <dimen name="line_size">1dp</dimen>
 
 
 </resources>
