@@ -14,7 +14,7 @@ import android.widget.EditText;
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.utils.ConstantManager;
 
-public class MainActivity extends AppCompatActivity implements NestedScrollView.OnScrollChangeListener {
+public class MainActivity extends AppCompatActivity {
 
     private static final String TAG= ConstantManager.TAG_PREFIX+"Main Activity";
 
@@ -76,8 +76,4 @@ public class MainActivity extends AppCompatActivity implements NestedScrollView.
 
     }
 
-    @Override
-    public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-
-    }
 }
