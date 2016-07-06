@@ -57,8 +57,6 @@
             app:layout_anchor="@id/appbar_layout"
             app:layout_anchorGravity="bottom|right"
             android:layout_marginRight="@dimen/fab_right_space"/>
-
-
         <include layout="@layout/content_scrolling"/>
 
     </android.support.design.widget.CoordinatorLayout>
