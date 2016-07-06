@@ -29,6 +29,7 @@ import com.softdesign.devintensive.utils.ConstantManager;
 import com.softdesign.devintensive.utils.RoundedAvatarDrawable;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.widget.LinearLayout;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 
@@ -56,7 +57,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         setContentView(R.layout.activity_main);
         Log.d(TAG, "onCreate");
 
-        mDataManager=new DataManager().getInstance();
+        mDataManager= DataManager.getInstance();
 
         mCallImg = (ImageView) findViewById(R.id.call_img);
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.main_coordinator_container);
@@ -215,7 +216,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     }
 
-    private void changeEditMode(int mode) {
+    private void changeEditMode(int mode)  {
 
         if (mode == 1) {
             mFab.setImageResource(R.drawable.ic_done_black_24dp);

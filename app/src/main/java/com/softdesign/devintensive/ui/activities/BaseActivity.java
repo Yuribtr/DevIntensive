@@ -45,4 +45,3 @@ public class BaseActivity extends AppCompatActivity{
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 }
-
