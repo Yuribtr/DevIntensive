@@ -30,42 +30,7 @@ public class CounterViewBehavior extends CoordinatorLayout.Behavior<LinearLayout
     @Override
     public boolean onDependentViewChanged(CoordinatorLayout parent, LinearLayout child, View dependency) {
 
-        Snackbar.make(parent, "getTranslationY: "+String.valueOf(dependency.getTranslationY()) +", getHeight: "+String.valueOf(dependency.getHeight()), Snackbar.LENGTH_LONG).show();
-
-        child.setY(dependency.getBottom());
-        float dependencyHeight = dependency.getBottom() - getActionBarHeight() - getStatusBarHeight();
-
-        if (mChildHeight == 0) {
-            mMaxDependencyHeight = dependencyHeight;
-        }
-
-        float minChildHeight = mContext.getResources().getDimensionPixelOffset(R.dimen.max_heigth_score_v) / 2;
-        float diffHeight = dependencyHeight / mMaxDependencyHeight;
-
-        if (diffHeight > 1){
-            diffHeight = 1;
-        }
-
-        mChildHeight = (int) (minChildHeight + minChildHeight * diffHeight);
-        child.setMinimumHeight(mChildHeight);
-
         return true;
     }
 
-    private int getStatusBarHeight() {
-        int result = 0;
-        int resourceId = mContext.getResources().getIdentifier("status_bar_height", "dimen", "android");
-        if (resourceId > 0) {
-            result = mContext.getResources().getDimensionPixelSize(resourceId);
-        }
-        return result;
-    }
-
-    private int getActionBarHeight() {
-        final TypedArray styledAttributes = mContext.getTheme().obtainStyledAttributes(
-                new int[]{android.R.attr.actionBarSize});
-        int actionBarHeight = (int) styledAttributes.getDimension(0, 0);
-        styledAttributes.recycle();
-        return actionBarHeight;
-    }
 }

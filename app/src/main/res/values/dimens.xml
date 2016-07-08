@@ -35,5 +35,6 @@
     <dimen name="profile_image_size">256dp</dimen>
     <dimen name="fab_right_space">8dp</dimen>
     <dimen name="max_heigth_score_v">112dp</dimen>
+    <dimen name="placeholder_photo_size_90">90dp</dimen>
 
 </resources>

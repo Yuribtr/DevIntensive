@@ -1,5 +1,7 @@
 package com.softdesign.devintensive.utils;
 
+import android.content.IntentSender;
+
 public interface ConstantManager {
     String TAG_PREFIX="DEV ";
     String COLOR_MODE_KEY="COLOR_MODE_KEY";
@@ -10,4 +12,18 @@ public interface ConstantManager {
     String USER_VK_KEY="USER_VK_KEY";
     String USER_REPOSITORY_KEY="USER_REPOSITORY_KEY";
     String USER_ABOUT_KEY="USER_ABOUT_KEY";
+    String USER_PHOTO_KEY = "USER_PHOTO_KEY";
+    String EMAIL_TYPE = "message/rfc822";
+    String FILE_TYPE_IMAGE = "image/*";
+    String FILE_MIME_TYPE_IMAGE = "image/jpeg";
+    String FILE_NAME_TYPE = "yyyyMMdd_HHmmss";
+    String FILE_NAME_EXT = ".jpg";
+
+    int LOAD_PROFILE_PHOTO = 1;
+    int REQUEST_CAMERA_PICTURE = 99;
+    int REQUEST_GALLERY_PICTURE = 88;
+
+    int PERMISSION_REQUEST_SETTINGS_CODE = 101;
+    int CAMERA_REQUEST_PERMISSION_CODE = 102;
+    int PHONE_CALL_REQUEST_PERMISSION_CODE = 103;
 }

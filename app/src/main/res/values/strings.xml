@@ -11,4 +11,23 @@
     <string name="email_send_et">Отправка E-mail</string>
     <string name="vk_et">ВКонтакте</string>
     <string name="about_et">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</string>
+    <string name="user_profile.placeholder.image">Изменить фотографию профиля</string>
+    <string name="user_profile_dialog_gallery">загрузить из галлереи</string>
+    <string name="user_profile_dialog_camera">сделать снимок</string>
+    <string name="user_profile_dialog_cancel">Отмена</string>
+    <string name="user_profile_dialog_title">Изменить фотографию профиля</string>
+    <string name="user_profile_choose_message">выберите фото</string>
+    <string name="message_allow">Разрешить</string>
+    <string name="message_permission_needed">Для корректной работы приложения необходимо дать требуемые разрешения</string>
+    <string name="login_text">ВОЙТИ</string>
+    <string name="password_lost">Забыли пароль?</string>
+    <string name="password_hint">Пароль</string>
+    <string name="message_choose_browser">Выберите броузер для просмотра ссылки</string>
+    <string name="message_choose_email">Выберите почтовую программу для отправки письма</string>
+    <string name="email_subject">Message from app: </string>
+    <string name="email_body">Тестовое сообщение</string>
+    <string name="no_email_programms_installed">Почтовые программы не установлены</string>
+    <string name="error_url_message">Неправильный адрес сайта</string>
+    <string name="error_email_message">Неправильный адрес email</string>
+    <string name="error_tel_message">Неправильный номер телефона</string>
 </resources>
