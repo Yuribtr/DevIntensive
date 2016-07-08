@@ -29,5 +29,5 @@
     <string name="no_email_programms_installed">Почтовые программы не установлены</string>
     <string name="error_url_message">Неправильный адрес сайта</string>
     <string name="error_email_message">Неправильный адрес email</string>
-    <string name="error_tel_message">Неправильный номер телефона</string>
+    <string name="error_phone_message">Неправильный номер телефона</string>
 </resources>

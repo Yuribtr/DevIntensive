@@ -1,6 +1,7 @@
 package com.softdesign.devintensive.ui.activities;
 
-import android.Manifest;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.Context;
@@ -11,6 +12,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.Manifest.*;
 import android.os.Environment;
+import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -28,7 +30,8 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -44,6 +47,7 @@ import java.util.*;
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.utils.ConstantManager;
+import com.softdesign.devintensive.utils.MyTextWatcher;
 import com.softdesign.devintensive.utils.RoundedAvatarDrawable;
 import com.squareup.picasso.Picasso;
 
@@ -110,6 +114,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         mUserGit = (EditText) findViewById(R.id.repository_et);
         mUserBio = (EditText) findViewById(R.id.about_et);
 
+        //mUserPhone.addTextChangedListener(new MyTextWatcher(mUserPhone, 1));//// TODO: доделать проверку на лету
+
         mUserInfoViews = new ArrayList<>();
         mUserInfoViews.add(mUserPhone);
         mUserInfoViews.add(mUserMail);
@@ -156,37 +162,31 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     @Override
     protected void onStart() {
         super.onStart();
-//        Log.d(TAG, "onStart");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-//        Log.d(TAG, "onResume");
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-//        Log.d(TAG, "onPause");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-//        Log.d(TAG, "onStop");
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-//        Log.d(TAG, "onDestroy");
     }
 
     @Override
     protected void onRestart() {
         super.onRestart();
-//        Log.d(TAG, "onRestart");
     }
 
 
@@ -212,10 +212,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             case R.id.git_btn:
                 openSite(mUserGit.getText().toString());
                 break;
-//            case R.id.call_img:
-//                showProgress();
-//                runWithDelay();
-//                break;
         }
     }
 
@@ -233,8 +229,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-//        Log.d(TAG, "onSaveInstanceState");
-//        outState.putInt(ConstantManager.EDIT_MODE_KEY, mCurrentEditMode);
     }
 
     private void showSnackbar(String message) {
@@ -295,15 +289,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             showProfilePlaceholder();
             lockToolbar();
             mCollapsingToolbar.setExpandedTitleColor(Color.TRANSPARENT);
-
-            EditText editText = (EditText) findViewById(R.id.phone_at);
-            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
-            editText.requestFocus();
+            setFocusEditText(R.id.phone_at);
             return mode;
         }
         else {
-
+            if (!checkUserValues()) return 1;
             mFab.setImageResource(R.drawable.ic_create_black_24dp);
             for (EditText userValue : mUserInfoViews) {
                 userValue.setEnabled(false);
@@ -316,6 +306,55 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             saveUserInfoValue();
             return mode;
         }
+    }
+
+    public void setFocusEditText(int editTextId){
+        EditText editText = (EditText) findViewById(editTextId);
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+        editText.requestFocus();
+    }
+
+    private boolean checkUserValues() {
+        for (EditText userValue : mUserInfoViews) {
+            switch (userValue.getId()) {
+                case R.id.phone_at:
+                    if (!checkWithRegExp(userValue.getText().toString(), ConstantManager.PATTERN_PHONE)){
+                        showToast(getString(R.string.error_phone_message));
+                        setFocusEditText(R.id.phone_at);
+                        return false;
+                    }
+                    break;
+                case R.id.email_et:
+                    if (!checkWithRegExp(userValue.getText().toString(), ConstantManager.PATTERN_EMAIL)){
+                        showToast(getString(R.string.error_email_message));
+                        setFocusEditText(R.id.email_et);
+                        return false;
+                    }
+                    break;
+                case R.id.vk_et:
+                    if (!checkWithRegExp(userValue.getText().toString(), ConstantManager.PATTERN_VK_URL)){
+                        showToast(getString(R.string.error_url_message));
+                        setFocusEditText(R.id.vk_et);
+                        return false;
+                    }
+                    break;
+                case R.id.repository_et:
+                    if (!checkWithRegExp(userValue.getText().toString(), ConstantManager.PATTERN_GIT_URL)){
+                        showToast(getString(R.string.error_url_message));
+                        setFocusEditText(R.id.repository_et);
+                        return false;
+                    }
+                    break;
+            }
+        }
+        return true;
+    }
+
+    private boolean checkWithRegExp(String testString, String pattern){
+        Pattern p = Pattern.compile(pattern);
+        Matcher m = p.matcher(testString);
+        return m.matches();
     }
 
     private void loadUserInfoValue() {
@@ -414,19 +453,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     public void onClick(DialogInterface dialog, int choiceItem) {
                         switch (choiceItem){
                             case 0:
-                                //// TODO: загрузить из галлереи
                                 loadPhotoFromGallery();
-                                //showSnackbar("загрузить из галлереи");
                                 break;
                             case 1:
-                                //// TODO: загрузить из камеры
                                 loadPhotoFromCamera();
-                                //showSnackbar("загрузить из камеры");
                                 break;
                             case 2:
-                                //// TODO: cancel
                                 dialog.cancel();
-                                showSnackbar("отмена");
                                 break;
                         }
                     }
@@ -467,7 +500,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private void openSite (String url) {
         if (!url.isEmpty()) {
             //simple check if url have protocol name
-            url = !url.startsWith("http://") ? "http://" + url : url;
+            url = !url.startsWith("http://") ? "https://" + url : url;
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setData(Uri.parse(url));
             String title = getResources().getText(R.string.message_choose_browser).toString();
@@ -482,7 +515,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         if (!email.isEmpty()) {
             Intent intent = new Intent(Intent.ACTION_SEND);
             intent.putExtra(Intent.EXTRA_EMAIL, new String[]{email});
-            intent.putExtra(Intent.EXTRA_SUBJECT, R.string.email_subject+R.string.app_name);
+            intent.putExtra(Intent.EXTRA_SUBJECT, R.string.email_subject+" "+R.string.app_name);
             intent.setType(ConstantManager.EMAIL_TYPE);
             try {
                 startActivity(intent);
@@ -500,7 +533,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 Intent callIntent = new Intent(Intent.ACTION_DIAL, uri);
                 startActivity(callIntent);
             } else {
-                showToast(getString(R.string.error_tel_message));
+                showToast(getString(R.string.error_phone_message));
             }
         } else {
             ActivityCompat.requestPermissions(this, new String[]{
@@ -515,16 +548,4 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     }).show();
         }
     }
-
-//       protected void runWithDelay (){
-//        final Handler handler = new Handler();
-//        handler.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                //TODO:выполнить с задержкой
-//                hideProgress();
-//            }
-//        },5000);
-//    }
 }
-//// TODO: 01:42

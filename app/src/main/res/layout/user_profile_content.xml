@@ -274,6 +274,7 @@
                         <EditText
                             android:id="@+id/about_et"
                             android:hint="О себе"
+                            android:inputType="textMultiLine"
                             android:text="@string/about_et"
                             style="@style/editText"/>
                     </android.support.design.widget.TextInputLayout>

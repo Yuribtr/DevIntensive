@@ -19,6 +19,11 @@ public interface ConstantManager {
     String FILE_NAME_TYPE = "yyyyMMdd_HHmmss";
     String FILE_NAME_EXT = ".jpg";
 
+    String PATTERN_PHONE = "^[+]{1}[-0-9]{1}\\s[-0-9]{3}\\s[-0-9]{3}-[-0-9]{2}-[-0-9]{2}";
+    String PATTERN_EMAIL = "^[a-zA-Z_0-9]{3,}@[a-zA-Z_0-9.]{2,}\\.[a-zA-Z0-9]{2,}$";
+    String PATTERN_VK_URL = "^vk\\.com\\/[a-zA-Z_0-9.]+$";
+    String PATTERN_GIT_URL = "^github\\.com\\/[a-zA-Z_0-9.]+$";
+
     int LOAD_PROFILE_PHOTO = 1;
     int REQUEST_CAMERA_PICTURE = 99;
     int REQUEST_GALLERY_PICTURE = 88;
