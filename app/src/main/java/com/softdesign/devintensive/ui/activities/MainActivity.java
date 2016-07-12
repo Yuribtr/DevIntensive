@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
 import android.Manifest.*;
@@ -37,6 +38,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -44,8 +46,14 @@ import java.util.*;
 
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
+import com.softdesign.devintensive.data.network.FileUploadService;
+import com.softdesign.devintensive.data.network.ServiceGenerator;
+import com.softdesign.devintensive.data.network.req.UserLoginReq;
+import com.softdesign.devintensive.data.network.res.UploadPhotoRes;
+import com.softdesign.devintensive.data.network.res.UserModelRes;
 import com.softdesign.devintensive.utils.ConstantManager;
 import com.softdesign.devintensive.utils.DevintensiveApplication;
+import com.softdesign.devintensive.utils.NetworkStatusChecker;
 import com.softdesign.devintensive.utils.RoundedAvatarDrawable;
 import com.softdesign.devintensive.utils.TransformRoundedImage;
 import com.squareup.picasso.Picasso;
@@ -53,6 +61,14 @@ import com.squareup.picasso.Picasso;
 import android.graphics.BitmapFactory;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.http.Multipart;
 
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
@@ -86,6 +102,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private AppBarLayout.LayoutParams mAppbarParams = null;
     private File mPhotoFile = null;
     private Uri mSelectedImage = null;
+    private String mUserId;
 
 
     @Override
@@ -153,6 +170,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         setupDrawer();
         initUserFields();
         initUserInfoValue();
+
+        mUserId = mDataManager.getPreferencesManager().getUserId();
 
         Picasso.with(this).load(mDataManager.getPreferencesManager().loadUserPhoto())
                 .placeholder(R.drawable.userphoto)//// TODO: сделать placeholder (1:38) трансформ и кроп
@@ -291,13 +310,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             case ConstantManager.REQUEST_GALLERY_PICTURE:
                 if (resultCode == RESULT_OK && data != null){
                     mSelectedImage = data.getData();
-                    insertProfileImage(mSelectedImage);
+                    insertProfileImage(mSelectedImage, 1);
                 }
                 break;
             case ConstantManager.REQUEST_CAMERA_PICTURE:
                 if (resultCode == RESULT_OK && mPhotoFile != null){
                     mSelectedImage = Uri.fromFile(mPhotoFile);
-                    insertProfileImage(mSelectedImage);
+                    insertProfileImage(mSelectedImage, 2);
                 }
                 break;
         }
@@ -521,13 +540,71 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         return image;
     }
 
-    private void insertProfileImage(Uri selectedImage) {
+    private void insertProfileImage(Uri selectedImage, int mode) {
         Picasso.with(this)
                 .load(mSelectedImage)
                 .into(mProfileImage);
         ////TODO: сделать placeholder (1:38) трансформ и кроп
         mDataManager.getPreferencesManager().saveUserPhoto(selectedImage);
+        
+        //// TODO: здесь посылаем фото на сервер
+        updateSiteProfileImage(selectedImage, mode);
     }
+
+    private void updateSiteProfileImage(Uri fileUri, int mode){
+        if (NetworkStatusChecker.isNetworkAvailable(this)) {
+            FileUploadService service = ServiceGenerator.createService(FileUploadService.class);
+            File file=null;
+            switch (mode) {
+                case 1://если фото пришло с галлереи то преобразуем его путь
+                    file = new File(getRealPathFromURI(this, fileUri));
+                    break;
+                case 2://если с камеры то напрямую подставляем
+                    file = new File(fileUri.getPath());
+                    break;
+            }
+            RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+            MultipartBody.Part body = MultipartBody.Part.createFormData("photo", file.getName(), requestFile);
+
+            Call<UploadPhotoRes> call = service.uploadPhoto(mUserId, body);
+            call.enqueue(new Callback<UploadPhotoRes>() {
+                             @Override
+                             public void onResponse(Call<UploadPhotoRes> call, Response<UploadPhotoRes> response) {
+                                 if (response.code()==200) {
+                                     showSnackbar(getString(R.string.success_photo_update_message));
+                                 } else if (response.code()==404) {
+                                     showSnackbar(getString(R.string.error_photo_update_message));
+                                 } else {
+                                     showSnackbar(getString(R.string.error_unknown));
+                                 }
+                             }
+                             @Override
+                             public void onFailure(Call<UploadPhotoRes> call, Throwable t) {
+                                 //// TODO: обработать ошибки ретрофита
+                             }
+                         });
+
+        } else {
+            showSnackbar(getString(R.string.error_network_is_not_available));
+
+        }
+    }
+
+    public String getRealPathFromURI(Context context, Uri contentUri) {
+        Cursor cursor = null;
+        try {
+            String[] proj = { MediaStore.Images.Media.DATA };
+            cursor = context.getContentResolver().query(contentUri,  proj, null, null, null);
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            return cursor.getString(column_index);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+
 
     public void openApplicationSettings() {
         Intent appSettingsIntent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:"+getPackageName()));

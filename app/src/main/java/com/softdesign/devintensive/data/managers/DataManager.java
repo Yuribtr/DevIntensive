@@ -2,12 +2,15 @@ package com.softdesign.devintensive.data.managers;
 
 import android.content.Context;
 
+import com.softdesign.devintensive.data.network.FileUploadService;
 import com.softdesign.devintensive.data.network.RestService;
 import com.softdesign.devintensive.data.network.ServiceGenerator;
 import com.softdesign.devintensive.data.network.req.UserLoginReq;
+import com.softdesign.devintensive.data.network.res.UploadPhotoRes;
 import com.softdesign.devintensive.data.network.res.UserModelRes;
 import com.softdesign.devintensive.utils.DevintensiveApplication;
 
+import okhttp3.MultipartBody;
 import retrofit2.Call;
 
 public class DataManager {
@@ -15,6 +18,7 @@ public class DataManager {
     private Context mContext;
     private PreferencesManager mPreferencesManager;
     private RestService mRestService;
+    private FileUploadService mFileUploadService;
 
     public DataManager(){
         this.mPreferencesManager = new PreferencesManager();
@@ -43,6 +47,12 @@ public class DataManager {
     //region ============ NETWORK ============
     public Call<UserModelRes> loginUser(UserLoginReq userLoginReq){
         return mRestService.loginUser(userLoginReq);
+    }
+    //endregion
+
+    //region ============ SAVE PHOTO ============
+    public Call<UploadPhotoRes> uploadPhoto(String userId, MultipartBody.Part file){
+        return mFileUploadService.uploadPhoto(userId, file);
     }
     //endregion
 

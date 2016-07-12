@@ -35,4 +35,6 @@
     <string name="error_login_or_password">неверный логин или пароль</string>
     <string name="error_unknown">неизвестная ошибка входа</string>
     <string name="error_network_is_not_available">сеть недоступна, попробуйте позже</string>
+    <string name="success_photo_update_message">Фотография профиля успешно обновлена</string>
+    <string name="error_photo_update_message">Ошибка загрузки фото на сервер (404)</string>
 </resources>
