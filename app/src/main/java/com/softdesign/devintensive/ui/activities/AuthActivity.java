@@ -6,7 +6,12 @@ import android.content.Intent;
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.data.managers.UserModelManager;
+import com.softdesign.devintensive.data.network.FileUploadService;
+import com.softdesign.devintensive.data.network.GetUserService;
+import com.softdesign.devintensive.data.network.ServiceGenerator;
 import com.softdesign.devintensive.data.network.req.UserLoginReq;
+import com.softdesign.devintensive.data.network.res.GetUserRes;
+import com.softdesign.devintensive.data.network.res.UploadPhotoRes;
 import com.softdesign.devintensive.data.network.res.UserModelRes;
 import com.softdesign.devintensive.utils.NetworkStatusChecker;
 
@@ -34,6 +39,7 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
     private EditText mLogin, mPassword;
     private CoordinatorLayout mCoordinatorLayout;
     private DataManager mDataManager;
+    private boolean autoLoginSuccess=false;
 
 
     @Override
@@ -51,13 +57,48 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
 
         mRememberPassword.setOnClickListener(this);
         mSignIn.setOnClickListener(this);
-
+        checkAutoLogin();
 
         EditText editText = (EditText) findViewById(R.id.login_email_et);
         editText.requestFocus();
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
 
+    }
+
+    private boolean checkAutoLogin (){
+        if (NetworkStatusChecker.isNetworkAvailable(this)) {
+            GetUserService service = ServiceGenerator.createService(GetUserService.class);
+            String userId = mDataManager.getPreferencesManager().getUserId();
+            String authToken = mDataManager.getPreferencesManager().getAuthToken();
+            if (userId.isEmpty() || authToken.isEmpty()) return false;
+            Call<GetUserRes> call = service.getUser(userId);
+            call.enqueue(new Callback<GetUserRes>() {
+                             @Override
+                             public void onResponse(Call<GetUserRes> call, Response<GetUserRes> response) {
+                                 if (response.code()==200) {
+                                     showSnackbar(getString(R.string.success_token_message));
+                                     loginSuccess(response.body());
+                                     autoLoginSuccess = true;
+                                 } else if (response.code()==404) {
+                                     showSnackbar(getString(R.string.error_login_or_password));
+                                 } else if (response.code()==401) {
+                                     showSnackbar(getString(R.string.error_token_message));
+                                 } else {
+                                     showSnackbar(getString(R.string.error_unknown));
+                                 }
+                             }
+                             @Override
+                             public void onFailure(Call<GetUserRes> call, Throwable t) {
+
+                             }
+                         }
+            );
+        } else {
+            showSnackbar(getString(R.string.error_network_is_not_available));
+
+        }
+        return autoLoginSuccess;
     }
 
     @Override
@@ -89,6 +130,13 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
     }
 
     private void loginSuccess (UserModelRes userModel){
+        UserModelManager.saveUserModelToPreferenses(mDataManager, userModel);
+        saveUserValues(userModel);
+        Intent loginIntent = new Intent(this, MainActivity.class);
+        startActivity(loginIntent);
+    }
+
+    private void loginSuccess (GetUserRes userModel){
         UserModelManager.saveUserModelToPreferenses(mDataManager, userModel);
         saveUserValues(userModel);
         Intent loginIntent = new Intent(this, MainActivity.class);
@@ -131,8 +179,12 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
         mDataManager.getPreferencesManager().saveUserProfileValues(userValues);
     }
 
-//        void submit(){
-//        Intent intent = new Intent(AuthActivity.this,MainActivity.class);
-//        startActivity(intent);
-//    }
+    private void saveUserValues (GetUserRes userModel) {
+        int[] userValues = {
+                userModel.getData().getProfileValues().getRait(),
+                userModel.getData().getProfileValues().getLinesCode(),
+                userModel.getData().getProfileValues().getProjects()
+        };
+        mDataManager.getPreferencesManager().saveUserProfileValues(userValues);
+    }
 }

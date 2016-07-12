@@ -37,4 +37,6 @@
     <string name="error_network_is_not_available">сеть недоступна, попробуйте позже</string>
     <string name="success_photo_update_message">Фотография профиля успешно обновлена</string>
     <string name="error_photo_update_message">Ошибка загрузки фото на сервер (404)</string>
+    <string name="error_token_message">Сохраненные данны входа устарели, войдите с паролем</string>
+    <string name="success_token_message">Сохраненные логин и токен действительны</string>
 </resources>
