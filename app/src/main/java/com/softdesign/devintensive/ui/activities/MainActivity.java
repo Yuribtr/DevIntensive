@@ -12,7 +12,6 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.Manifest.*;
 import android.os.Environment;
-import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -24,14 +23,13 @@ import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -47,12 +45,15 @@ import java.util.*;
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.utils.ConstantManager;
-import com.softdesign.devintensive.utils.MyTextWatcher;
+import com.softdesign.devintensive.utils.DevintensiveApplication;
 import com.softdesign.devintensive.utils.RoundedAvatarDrawable;
+import com.softdesign.devintensive.utils.TransformRoundedImage;
 import com.squareup.picasso.Picasso;
 
 import android.graphics.BitmapFactory;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
+
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 
@@ -77,8 +78,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private ImageView avatar_iv;
     private NavigationView navigation_v;
     private EditText mUserPhone, mUserMail, mUserVK, mUserGit, mUserBio;
-
     private List<EditText> mUserInfoViews;
+
+    private TextView mUserValueRating, mUserValueCodeLines, mUserValueProjects, mUserFio, mUserEmail;
+    private List<TextView> mUserValueViews;
+
     private AppBarLayout.LayoutParams mAppbarParams = null;
     private File mPhotoFile = null;
     private Uri mSelectedImage = null;
@@ -114,6 +118,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         mUserGit = (EditText) findViewById(R.id.repository_et);
         mUserBio = (EditText) findViewById(R.id.about_et);
 
+        mUserValueRating = (TextView) findViewById(R.id.user_info_rating_tv);
+        mUserValueCodeLines = (TextView) findViewById(R.id.user_info_code_lines_tv);
+        mUserValueProjects = (TextView) findViewById(R.id.user_info_projects_tv);
+
         //mUserPhone.addTextChangedListener(new MyTextWatcher(mUserPhone, 1));//// TODO: доделать проверку на лету
 
         mUserInfoViews = new ArrayList<>();
@@ -123,6 +131,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         mUserInfoViews.add(mUserGit);
         mUserInfoViews.add(mUserBio);
 
+        mUserValueViews = new ArrayList<>();
+        mUserValueViews.add(mUserValueRating);
+        mUserValueViews.add(mUserValueCodeLines);
+        mUserValueViews.add(mUserValueProjects);
+
         mCallBtn.setOnClickListener(this);
         mEmailBtn.setOnClickListener(this);
         mVkBtn.setOnClickListener(this);
@@ -130,16 +143,28 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         mFab.setOnClickListener(this);
         mProfilePlaceholder.setOnClickListener(this);
+
+        drawer_l = (DrawerLayout) findViewById(R.id.navigation_drawer);
+        navigation_v = (NavigationView) findViewById(R.id.navigation_view);
+        mUserFio = (TextView) navigation_v.getHeaderView(0).findViewById(R.id.user_name_txt);
+        mUserEmail = (TextView) navigation_v.getHeaderView(0).findViewById(R.id.user_email_txt);
+
         setupToolbar();
         setupDrawer();
-        loadUserInfoValue();
+        initUserFields();
+        initUserInfoValue();
+
         Picasso.with(this).load(mDataManager.getPreferencesManager().loadUserPhoto())
                 .placeholder(R.drawable.userphoto)//// TODO: сделать placeholder (1:38) трансформ и кроп
                 .into(mProfileImage);
-        drawer_l = (DrawerLayout) findViewById(R.id.navigation_drawer);
-        navigation_v = (NavigationView) findViewById(R.id.navigation_view);
+
         avatar_iv = (ImageView) navigation_v.getHeaderView(0).findViewById(R.id.avatar);
-        avatar_iv.setImageBitmap(RoundedAvatarDrawable.getRoundedBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.avatar)));
+        //avatar_iv.setImageBitmap(RoundedAvatarDrawable.getRoundedBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.avatar)));
+        if (avatar_iv != null)
+            Picasso.with(this)
+                    .load(mDataManager.getPreferencesManager().loadUserAvatar())
+                    .transform(new TransformRoundedImage())
+                    .into(avatar_iv);
 
         if (savedInstanceState == null) {
             //активити запускается впервые
@@ -303,7 +328,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             hideProfilePlaceholder();
             unlockToolbar();
             mCollapsingToolbar.setExpandedTitleColor(getResources().getColor(R.color.white));
-            saveUserInfoValue();
+            saveUserFields();
             return mode;
         }
     }
@@ -356,20 +381,32 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         Matcher m = p.matcher(testString);
         return m.matches();
     }
-
-    private void loadUserInfoValue() {
+//загружаем инфу пользователя в поля
+    private void initUserFields() {
         List<String> userData = mDataManager.getPreferencesManager().loadUserProfileData();
         for (int i=0;i<userData.size();i++){
             mUserInfoViews.get(i).setText(userData.get(i));
         }
+
+        //подгружаем ФИО и почту в боковое меню
+        mUserFio.setText(mDataManager.getPreferencesManager().loadUserFio());
+        setTitle(mDataManager.getPreferencesManager().loadUserFio()+" App");
+        mUserEmail.setText(mDataManager.getPreferencesManager().loadUserEmail());
     }
 
-    private void saveUserInfoValue() {
+    private void saveUserFields() {
         List<String> userData = new ArrayList<>();
         for (EditText userFieldView : mUserInfoViews) {
             userData.add(userFieldView.getText().toString());
         }
         mDataManager.getPreferencesManager().saveUserProfileData(userData);
+    }
+//загружаем счетчики в поля
+    private void initUserInfoValue(){
+        List<String> userData = mDataManager.getPreferencesManager().loadUserProfileValues();
+        for (int i=0; i<userData.size(); i++) {
+            mUserValueViews.get(i).setText(userData.get(i));
+        }
     }
 
     private void loadPhotoFromGallery () {

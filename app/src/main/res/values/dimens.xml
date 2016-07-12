@@ -24,7 +24,8 @@
     <dimen name="text_size_micro">12sp</dimen>
     <dimen name="text_size_small">14sp</dimen>
     <dimen name="text_size_medium">18sp</dimen>
-    <dimen name="text_size_large">22sp</dimen>
+    <dimen name="text_size_large">20sp</dimen>
+    <dimen name="text_size_larger">22sp</dimen>
 
     <dimen name="spacing_vertical_statusbar">24dp</dimen>
     <dimen name="spacing_vertical_toolbar">56dp</dimen>
@@ -36,5 +37,11 @@
     <dimen name="fab_right_space">8dp</dimen>
     <dimen name="max_heigth_score_v">112dp</dimen>
     <dimen name="placeholder_photo_size_90">90dp</dimen>
+    <dimen name="counter_max_height">112dp</dimen>
+    <dimen name="authorization_box_width">240dp</dimen>
+    <dimen name="corner_radius">2dp</dimen>
+    <dimen name="margin_right_view_auth">20dp</dimen>
+    <dimen name="login_button_min_width">126dp</dimen>
+
 
 </resources>

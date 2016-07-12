@@ -30,4 +30,9 @@
     <string name="error_url_message">Неправильный адрес сайта</string>
     <string name="error_email_message">Неправильный адрес email</string>
     <string name="error_phone_message">Неправильный номер телефона</string>
+    <string name="ff_medium">sans-serif-medium</string>
+    <string name="ff_regular">sans-serif-condensed</string>
+    <string name="error_login_or_password">неверный логин или пароль</string>
+    <string name="error_unknown">неизвестная ошибка входа</string>
+    <string name="error_network_is_not_available">сеть недоступна, попробуйте позже</string>
 </resources>
