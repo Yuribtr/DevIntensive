@@ -78,7 +78,58 @@
 
         </android.support.design.widget.AppBarLayout>
 
+        <LinearLayout
+            android:id="@+id/counter_view"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/counter_max_height"
+            android:background="@color/color_primary"
+            android:gravity="center"
+            android:orientation="horizontal"
+            app:layout_behavior=".ui.behaviors.CounterViewBehavior"
+            app:behavior_min_height="@dimen/spacing_large_56">
 
+            <LinearLayout
+                style="@style/headContainer"
+                android:layout_weight="0.25">
+                <TextView
+                    android:id="@+id/user_info_rating_tv"
+                    style="@style/headText.big"
+                    android:text="@string/counter_tv"/>
+                <TextView
+                    style="@style/headText"
+                    android:text="@string/rating_tv"/>
+            </LinearLayout>
+            <View
+                android:layout_width="@dimen/line_size"
+                android:layout_height="@dimen/spacing_larger_72"
+                android:background="@color/grey_light"/>
+            <LinearLayout
+                style="@style/headContainer"
+                android:layout_weight="0.5">
+                <TextView
+                    android:id="@+id/user_info_code_lines_tv"
+                    style="@style/headText.big"
+                    android:text="@string/counter_tv"/>
+                <TextView
+                    style="@style/headText"
+                    android:text="@string/code_lines_counts_tv"/>
+            </LinearLayout>
+            <View
+                android:layout_width="@dimen/line_size"
+                android:layout_height="@dimen/spacing_larger_72"
+                android:background="@color/grey_light"/>
+            <LinearLayout
+                style="@style/headContainer"
+                android:layout_weight="0.25">
+                <TextView
+                    android:id="@+id/user_info_projects_tv"
+                    style="@style/headText.big"
+                    android:text="@string/counter_tv"/>
+                <TextView
+                    style="@style/headText"
+                    android:text="@string/project_counts_tv"/>
+            </LinearLayout>
+        </LinearLayout>
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab"

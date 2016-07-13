@@ -1,65 +1,16 @@
-<?xml version="1.0" encoding="utf-8"?>
 <android.support.v4.widget.NestedScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nested_scroll"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+    app:layout_behavior=".ui.behaviors.CustomNestedScrollBehavior"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-
-        <LinearLayout
-            android:id="@+id/counter_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/grey"
-            android:orientation="horizontal"
-            android:paddingBottom="@dimen/spacing_medial_24"
-            android:paddingTop="@dimen/spacing_medial_24">
-
-            <LinearLayout
-                style="@style/headContainer"
-                android:layout_weight="0.25">
-                <TextView
-                    style="@style/headText.big"
-                    android:text="@string/counter_tv"/>
-                <TextView
-                    style="@style/headText"
-                    android:text="@string/rating_tv"/>
-            </LinearLayout>
-            <View
-                android:layout_width="@dimen/line_size"
-                android:layout_height="@dimen/spacing_larger_72"
-                android:background="@color/grey_light"/>
-            <LinearLayout
-                style="@style/headContainer"
-                android:layout_weight="0.5">
-                <TextView
-                    style="@style/headText.big"
-                    android:text="@string/counter_tv"/>
-                <TextView
-                    style="@style/headText"
-                    android:text="@string/code_lines_counts_tv"/>
-            </LinearLayout>
-            <View
-                android:layout_width="@dimen/line_size"
-                android:layout_height="@dimen/spacing_larger_72"
-                android:background="@color/grey_light"/>
-            <LinearLayout
-                style="@style/headContainer"
-                android:layout_weight="0.25">
-                <TextView
-                    style="@style/headText.big"
-                    android:text="@string/counter_tv"/>
-                <TextView
-                    style="@style/headText"
-                    android:text="@string/project_counts_tv"/>
-            </LinearLayout>
-        </LinearLayout>
 
 
         <LinearLayout
