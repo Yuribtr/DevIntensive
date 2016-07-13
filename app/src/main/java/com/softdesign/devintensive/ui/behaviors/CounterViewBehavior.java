@@ -26,7 +26,9 @@ public class CounterViewBehavior<V extends LinearLayout> extends AppBarLayout.Sc
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.CounterViewBehavior);
         mMinUserInfoHeight = a.getDimensionPixelSize(R.styleable.CounterViewBehavior_behavior_min_height, 56);
         a.recycle();
-        mMinAppBarHeight= UiHelper.getStatusBarHeight()+UiHelper.getActionBarHeight();//80dp
+        //int StatusBarHeight = UiHelper.getStatusBarHeight();//84
+        //int ActionBarHeight = UiHelper.getActionBarHeight();//196
+        mMinAppBarHeight= UiHelper.getStatusBarHeight()+UiHelper.getActionBarHeight();//280dp
         mMaxAppBarHeight=context.getResources().getDimensionPixelSize(R.dimen.profile_image_size);//256dp
         mMaxUserInfoHeight=context.getResources().getDimensionPixelSize(R.dimen.counter_max_height);//112dp
     }

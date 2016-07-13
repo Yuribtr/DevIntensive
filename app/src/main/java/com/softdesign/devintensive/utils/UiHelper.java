@@ -9,9 +9,13 @@ public class UiHelper {
 
     public static int getStatusBarHeight(){
         int result = 0;
-        int resourceID = mContext.getResources().getIdentifier("status_bar_height", "dimen", "android");
-        if (resourceID>0) {
-            result=mContext.getResources().getDimensionPixelSize(resourceID);
+        try {
+            int resourceID = mContext.getResources().getIdentifier("status_bar_height", "dimen", "android");
+            if (resourceID > 0) {
+                result = mContext.getResources().getDimensionPixelSize(resourceID);
+            }
+        } catch (Exception e){
+
         }
         return result;
     }

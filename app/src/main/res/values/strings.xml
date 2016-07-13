@@ -39,4 +39,6 @@
     <string name="error_photo_update_message">Ошибка загрузки фото на сервер (404)</string>
     <string name="error_token_message">Сохраненные данны входа устарели, войдите с паролем</string>
     <string name="success_token_message">Сохраненные логин и токен действительны</string>
+    <string name="my_profile_mi">Мой профиль</string>
+    <string name="my_team_im">Команда</string>
 </resources>

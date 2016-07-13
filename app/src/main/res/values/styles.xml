@@ -51,12 +51,12 @@
         <item name="android:textColor">@color/white</item>
         <item name="android:fontFamily">sans-serif-condensed</item>
         <item name="android:gravity">center</item>
-        <item name="android:textSize">16sp</item>
+        <item name="android:textSize">14sp</item>
 
     </style>
 
     <style name="headText.big" parent="headText">
-        <item name="android:textSize">28sp</item>
+        <item name="android:textSize">22sp</item>
     </style>
 
     <style name="headContainer">

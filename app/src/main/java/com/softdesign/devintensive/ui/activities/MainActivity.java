@@ -13,6 +13,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.Manifest.*;
 import android.os.Environment;
+import android.provider.Browser;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -31,6 +32,8 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -85,7 +88,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private DrawerLayout mNavigationDrawer;
     private FloatingActionButton mFab;
 
-
     private RelativeLayout mProfilePlaceholder;
     private CollapsingToolbarLayout mCollapsingToolbar;
     private AppBarLayout mAppBarLayout;
@@ -103,6 +105,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private File mPhotoFile = null;
     private Uri mSelectedImage = null;
     private String mUserId;
+
+    private MenuItem mUser_profile_menu;
 
 
     @Override
@@ -163,8 +167,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         drawer_l = (DrawerLayout) findViewById(R.id.navigation_drawer);
         navigation_v = (NavigationView) findViewById(R.id.navigation_view);
+
         mUserFio = (TextView) navigation_v.getHeaderView(0).findViewById(R.id.user_name_txt);
         mUserEmail = (TextView) navigation_v.getHeaderView(0).findViewById(R.id.user_email_txt);
+
 
         setupToolbar();
         setupDrawer();
@@ -295,6 +301,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                                                              @Override
                                                              public boolean onNavigationItemSelected(MenuItem item) {
                                                                  showSnackbar(item.getTitle().toString());
+                                                                 if (item.getItemId()==R.id.user_profile_menu) openSite2(ConstantManager.BASE_URL+"login");
+
                                                                  item.setChecked(true);
                                                                  mNavigationDrawer.closeDrawer(GravityCompat.START);
                                                                  return false;
@@ -406,13 +414,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         for (int i=0;i<userData.size();i++){
             mUserInfoViews.get(i).setText(userData.get(i));
         }
-
         //подгружаем ФИО и почту в боковое меню
         mUserFio.setText(mDataManager.getPreferencesManager().loadUserFio());
-        setTitle(mDataManager.getPreferencesManager().loadUserFio()+" App");
         mUserEmail.setText(mDataManager.getPreferencesManager().loadUserEmail());
+        //меняем заголовок программы
+        setTitle(mDataManager.getPreferencesManager().loadUserFio()+" App");
     }
-
+//сохраняем отредактированные поля
     private void saveUserFields() {
         List<String> userData = new ArrayList<>();
         for (EditText userFieldView : mUserInfoViews) {
@@ -427,7 +435,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             mUserValueViews.get(i).setText(userData.get(i));
         }
     }
-
+//загружаем фото с галлереи
     private void loadPhotoFromGallery () {
         Intent takeGalleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         takeGalleryIntent.setType(ConstantManager.FILE_TYPE_IMAGE);
@@ -624,6 +632,19 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             showToast(getString(R.string.error_url_message));
         }
     }
+
+    private void openSite2 (String url){
+        Uri outageURI = Uri.parse(url);
+        Intent i = new Intent(Intent.ACTION_VIEW, outageURI);
+        String authorization = "yuribtr@gmail.com" + ":" + "qawsedrf";
+        String authorizationBase64 = Base64.encodeToString(authorization.getBytes(), 0);
+        Bundle bundle = new Bundle();
+        bundle.putString("Authorization", "Basic " + authorizationBase64);
+        i.putExtra(Browser.EXTRA_HEADERS, bundle);
+        //Log.d(TAG, "intent:" + i.toString());
+        startActivity(i);
+    }
+
     private void openEmail (String email) {
         //simple check if address exist
         if (!email.isEmpty()) {
