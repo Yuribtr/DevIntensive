@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.design.widget.CoordinatorLayout
+    android:id="@+id/main_coordinator_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/color_primary"
+        android:theme="@style/AppTheme.AppBarOverlay"
+        android:fitsSystemWindows="true">
+
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:id="@+id/collapsing_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:contentScrim="@color/color_primary"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
+
+                <ImageView
+                    android:id="@+id/user_photo_img"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/profile_image_size"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/user_bg"
+                    android:fitsSystemWindows="true"/>
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:theme="@style/ToolBarStyle"
+                android:popupTheme="@style/AppTheme.PopupOverlay"
+                android:titleTextColor="@color/white"
+                app:layout_collapseMode="pin"/>
+
+        </android.support.design.widget.CollapsingToolbarLayout>
+
+    </android.support.design.widget.AppBarLayout>
+
+    <LinearLayout
+        android:id="@+id/counter_view"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/counter_max_height"
+        android:background="@color/color_primary"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_behavior=".ui.behaviors.CounterViewBehavior"
+        app:behavior_min_height="@dimen/spacing_large_56">
+
+        <LinearLayout
+            style="@style/headContainer"
+            android:layout_weight="0.25">
+            <TextView
+                android:id="@+id/user_info_rating_tv"
+                style="@style/headText.big"
+                android:text="@string/counter_tv"/>
+            <TextView
+                style="@style/headText"
+                android:text="@string/rating_tv"/>
+        </LinearLayout>
+        <View
+            android:layout_width="@dimen/line_size"
+            android:layout_height="@dimen/spacing_larger_72"
+            android:background="@color/grey_light"/>
+        <LinearLayout
+            style="@style/headContainer"
+            android:layout_weight="0.5">
+            <TextView
+                android:id="@+id/user_info_code_lines_tv"
+                style="@style/headText.big"
+                android:text="@string/counter_tv"/>
+            <TextView
+                style="@style/headText"
+                android:text="@string/code_lines_counts_tv"/>
+        </LinearLayout>
+        <View
+            android:layout_width="@dimen/line_size"
+            android:layout_height="@dimen/spacing_larger_72"
+            android:background="@color/grey_light"/>
+        <LinearLayout
+            style="@style/headContainer"
+            android:layout_weight="0.25">
+            <TextView
+                android:id="@+id/user_info_projects_tv"
+                style="@style/headText.big"
+                android:text="@string/counter_tv"/>
+            <TextView
+                style="@style/headText"
+                android:text="@string/project_counts_tv"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <include layout="@layout/static_profile_content"/>
+
+
+</android.support.design.widget.CoordinatorLayout>

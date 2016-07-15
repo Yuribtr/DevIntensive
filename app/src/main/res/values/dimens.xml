@@ -27,6 +27,10 @@
     <dimen name="text_size_large">20sp</dimen>
     <dimen name="text_size_larger">22sp</dimen>
 
+    <dimen name="font_large_24">24sp</dimen>
+    <dimen name="font_medium_20">20sp</dimen>
+    <dimen name="font_small_14">14sp</dimen>
+
     <dimen name="spacing_vertical_statusbar">24dp</dimen>
     <dimen name="spacing_vertical_toolbar">56dp</dimen>
     <dimen name="spacing_vertical_subtitle">48dp</dimen>
@@ -42,6 +46,7 @@
     <dimen name="corner_radius">2dp</dimen>
     <dimen name="margin_right_view_auth">20dp</dimen>
     <dimen name="login_button_min_width">126dp</dimen>
+    <dimen name="null_size_0">0dp</dimen>
 
 
 </resources>

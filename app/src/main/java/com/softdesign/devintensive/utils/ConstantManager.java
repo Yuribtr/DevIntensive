@@ -41,4 +41,5 @@ public interface ConstantManager {
     int PHONE_CALL_REQUEST_PERMISSION_CODE = 103;
 
 
+    String PARCELABLE_KEY = "PARCELABLE_KEY";
 }
