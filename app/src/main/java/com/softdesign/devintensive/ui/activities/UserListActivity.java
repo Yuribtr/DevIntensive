@@ -10,6 +10,7 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -17,11 +18,14 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.data.network.res.UserListRes;
 import com.softdesign.devintensive.data.storage.models.UserDTO;
+import com.softdesign.devintensive.ui.adapters.SuggestsAdapter;
+import com.softdesign.devintensive.ui.adapters.SuggestsAdapter.SuggestModel;
 import com.softdesign.devintensive.ui.adapters.UsersAdapter;
 import com.softdesign.devintensive.utils.ConstantManager;
 
@@ -44,6 +48,12 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
     private UsersAdapter mUsersAdapter;
     private ArrayList<UserListRes.Datum> mUsers;
 
+    private SearchView mSearchView;
+    private CardView mSuggestsView;
+    private RecyclerView mSuggestsRecyclerView;
+    private SuggestsAdapter mSuggestsAdapter;
+    private List<SuggestModel> mSearchSuggests = new ArrayList<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,8 +64,9 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.main_coordinator_container);
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         mNavigationDrawer = (DrawerLayout) findViewById(R.id.navigation_drawer);
-        mRecyclerView = (RecyclerView) findViewById(R.id.user_list);
 
+        mSuggestsView = (CardView) findViewById(R.id.search_card);
+        mRecyclerView = (RecyclerView) findViewById(R.id.user_list);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(linearLayoutManager);
 
@@ -121,6 +132,7 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
                                 }
                             });
                             mRecyclerView.setAdapter(mUsersAdapter);
+                            initSearchSuggests();
                         } catch (NullPointerException e) {
                             Log.e(TAG, e.toString());
                             showSnackbar(getString(R.string.error_null_pointer));
@@ -155,12 +167,13 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
                 }
             });
             mRecyclerView.setAdapter(mUsersAdapter);
+            initSearchSuggests();
             hideProgress();
         }
     }
 
     private void setupDrawer() {
-        //// TODO: 14.07.2016 реализовать переход в другое активити при клике по элементу меню в NavigationDrawer
+        //// TODO: реализовать переход в другое активити при клике по элементу меню в NavigationDrawer
     }
 
     private void setupToolbar() {
@@ -180,16 +193,66 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        return false;
+        if (mSuggestsAdapter != null) {
+            showSuggestList();
+            mSuggestsAdapter.filter(newText);
+            mSuggestsRecyclerView.scrollToPosition(0);
+        }
+        return true;
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.search_menu, menu);
+        getMenuInflater().inflate(R.menu.user_list_menu, menu);
+
         MenuItem searchItem = menu.findItem(R.id.search);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-        searchView.setOnQueryTextListener(this);
+        mSearchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        mSearchView.setOnQueryTextListener(this);
+        mSearchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    showSuggestList();
+                } else {
+                    hideSuggestList();
+                }
+            }
+        });
         return true;
+//        getMenuInflater().inflate(R.menu.search_menu, menu);
+//        MenuItem searchItem = menu.findItem(R.id.search);
+//        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+//        searchView.setOnQueryTextListener(this);
+//        return true;
     }
 
+    private void showSuggestList() {
+        if (mSuggestsView.getVisibility() == View.GONE) {
+            mSuggestsView.setVisibility(View.VISIBLE);
+            mRecyclerView.setLayoutFrozen(true);
+        }
+    }
+
+    private void hideSuggestList() {
+        mSuggestsView.setVisibility(View.GONE);
+        mRecyclerView.setLayoutFrozen(false);
+    }
+
+    private void initSearchSuggests() {
+        for (int i = 0; i < mUsers.size(); i++) {
+            mSearchSuggests.add(new SuggestModel(mUsers.get(i).getFullName(), i));
+        }
+        mSuggestsRecyclerView = (RecyclerView) findViewById(R.id.search_suggests_rv);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        mSuggestsRecyclerView.setLayoutManager(layoutManager);
+        mSuggestsAdapter = new SuggestsAdapter(mSearchSuggests,
+                new SuggestsAdapter.SuggestViewHolder.OnSuggestionClickListener() {
+                    @Override
+                    public void onSuggestionClickListener(int position) {
+                        hideSuggestList();
+                        mRecyclerView.scrollToPosition(mSuggestsAdapter.getModel(position).getPosition());
+                    }
+                });
+        mSuggestsRecyclerView.setAdapter(mSuggestsAdapter);
+    }
 }
