@@ -28,4 +28,8 @@ public class AspectRatioImageView extends ImageView {
         //устанавливаем новую ширину и высоту
         setMeasuredDimension(newWidth, newHeight);
     }
+
+    public static float getDefaultAspectRatio() {
+        return DEFAULT_ASPECT_RATIO;
+    }
 }

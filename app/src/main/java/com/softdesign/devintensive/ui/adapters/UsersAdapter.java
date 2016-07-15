@@ -41,9 +41,10 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
         } else {
             Picasso.with(mContext)
                     .load(user.getPublicInfo().getPhoto())////
+                    .resize((int) mContext.getResources().getDimension(R.dimen.profile_image_size), (int) (mContext.getResources().getDimension(R.dimen.profile_image_size)/AspectRatioImageView.getDefaultAspectRatio()))
+                    .centerCrop()
                     .placeholder(mContext.getResources().getDrawable(R.drawable.user_bg))
                     .error(mContext.getResources().getDrawable(R.drawable.user_bg))
-                    .fit()
                     .into(holder.userPhoto);
         }
 

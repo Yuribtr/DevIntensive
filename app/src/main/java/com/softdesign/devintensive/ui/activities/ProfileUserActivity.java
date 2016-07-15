@@ -1,5 +1,6 @@
 package com.softdesign.devintensive.ui.activities;
 
+import android.content.Intent;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
@@ -15,6 +16,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.softdesign.devintensive.R;
+import com.softdesign.devintensive.data.network.res.UserListRes;
 import com.softdesign.devintensive.data.storage.models.UserDTO;
 import com.softdesign.devintensive.ui.adapters.RepositoriesAdapter;
 import com.softdesign.devintensive.utils.ConstantManager;
@@ -22,6 +24,7 @@ import com.squareup.picasso.Picasso;
 
 import org.w3c.dom.Text;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ProfileUserActivity extends BaseActivity {
@@ -32,8 +35,8 @@ public class ProfileUserActivity extends BaseActivity {
     private TextView mUserRating, mUserCodeLines, mUserProjects;
     private CollapsingToolbarLayout mCollapsingToolbarLayout;
     private CoordinatorLayout mCoordinatorLayout;
-
     private ListView mRepoListView;
+    private ArrayList<UserListRes.Datum> mUsers;
 
 
     @Override
@@ -67,10 +70,12 @@ public class ProfileUserActivity extends BaseActivity {
 
     private void initProfileData(){
         UserDTO userDTO = getIntent().getParcelableExtra(ConstantManager.PARCELABLE_KEY);
+        //mUsers = getIntent().getParcelableArrayListExtra("mUsers");
 
         final List<String> repositories = userDTO.getRepositories();
         final RepositoriesAdapter repositoriesAdapter = new RepositoriesAdapter(this, repositories);
         mRepoListView.setAdapter(repositoriesAdapter);
+
 
         mRepoListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -97,4 +102,13 @@ public class ProfileUserActivity extends BaseActivity {
         }
 
     }
+
+//    @Override
+//    public void finish() {
+//        Intent intent = new Intent();
+//        intent.putParcelableArrayListExtra("mUsers", mUsers);
+//        setResult(RESULT_OK, intent);
+//        super.finish();
+//    }
+
 }
