@@ -25,7 +25,6 @@ import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -33,45 +32,34 @@ import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
-
-
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.data.network.FileUploadService;
 import com.softdesign.devintensive.data.network.ServiceGenerator;
-import com.softdesign.devintensive.data.network.req.UserLoginReq;
 import com.softdesign.devintensive.data.network.res.UploadPhotoRes;
-import com.softdesign.devintensive.data.network.res.UserModelRes;
 import com.softdesign.devintensive.utils.ConstantManager;
-import com.softdesign.devintensive.utils.DevintensiveApplication;
 import com.softdesign.devintensive.utils.NetworkStatusChecker;
-import com.softdesign.devintensive.utils.RoundedAvatarDrawable;
 import com.softdesign.devintensive.utils.TransformRoundedImage;
 import com.squareup.picasso.Picasso;
-
-import android.graphics.BitmapFactory;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.http.Multipart;
+
 
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {

@@ -1,7 +1,7 @@
 package com.softdesign.devintensive.ui.activities;
 
 import android.content.Intent;
-import android.os.PersistableBundle;
+import android.os.Handler;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
@@ -10,49 +10,35 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
-import com.softdesign.devintensive.data.network.res.UserListRes;
+import com.softdesign.devintensive.data.storage.models.User;
 import com.softdesign.devintensive.data.storage.models.UserDTO;
-import com.softdesign.devintensive.ui.adapters.SuggestsAdapter;
-import com.softdesign.devintensive.ui.adapters.SuggestsAdapter.SuggestModel;
 import com.softdesign.devintensive.ui.adapters.UsersAdapter;
 import com.softdesign.devintensive.utils.ConstantManager;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
-public class UserListActivity extends BaseActivity implements SearchView.OnQueryTextListener{
+public class UserListActivity extends BaseActivity {
     private static final String TAG = ConstantManager.TAG_PREFIX + " UserListActivity";
-
     private CoordinatorLayout mCoordinatorLayout;
     private Toolbar mToolbar;
     private DrawerLayout mNavigationDrawer;
     private RecyclerView mRecyclerView;
-
     private DataManager mDataManager;
     private UsersAdapter mUsersAdapter;
-    private ArrayList<UserListRes.Datum> mUsers;
+    private List<User> mUsers;
+    private MenuItem mSearchitem;
 
-    private SearchView mSearchView;
-    private CardView mSuggestsView;
-    private RecyclerView mSuggestsRecyclerView;
-    private SuggestsAdapter mSuggestsAdapter;
-    private List<SuggestModel> mSearchSuggests = new ArrayList<>();
+    private String mQuery;
+
+    private Handler mHandler;
 
 
     @Override
@@ -65,33 +51,18 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         mNavigationDrawer = (DrawerLayout) findViewById(R.id.navigation_drawer);
 
-        mSuggestsView = (CardView) findViewById(R.id.search_card);
         mRecyclerView = (RecyclerView) findViewById(R.id.user_list);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(linearLayoutManager);
 
 
+//// TODO: восстанавливать данные при повороте экрана
 
-        if (savedInstanceState!=null && mUsers==null){
-            mUsers = savedInstanceState.getParcelableArrayList("mUsers");
-        }
+        mHandler = new Handler();
+
         setupToolbar();
         setupDrawer();
-        loadUsers();
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putParcelableArrayList("mUsers", mUsers);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-//        if (savedInstanceState!=null && mUsers==null){
-//            mUsers = savedInstanceState.getParcelableArrayList("mUsers");
-//        }
+        loadUsersFromDb();
     }
 
     @Override
@@ -106,69 +77,12 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
         Snackbar.make(mCoordinatorLayout, message, Snackbar.LENGTH_LONG).show();
     }
 
-    private void loadUsers() {
-        showProgress();
-
-        if (mUsers==null) {
-            Call<UserListRes> call = mDataManager.getUserList();
-
-            call.enqueue(new Callback<UserListRes>() {
-                @Override
-                public void onResponse(Call<UserListRes> call, Response<UserListRes> response) {
-                    if (response.code()==200) {
-                        try {
-                            mUsers = response.body().getData();
-                            mUsersAdapter = new UsersAdapter(mUsers, new UsersAdapter.UserViewHolder.CustomClickListener() {
-                                @Override
-                                public void onUserItemClickListener(int position) {
-                                    //передаем данные в новую активити через Data Transfer Objects
-                                    showProgress();
-                                    UserDTO userDTO = new UserDTO(mUsers.get(position));
-                                    Intent profileIntent = new Intent(UserListActivity.this, ProfileUserActivity.class);
-                                    profileIntent.putExtra(ConstantManager.PARCELABLE_KEY, userDTO);
-                                    //profileIntent.putParcelableArrayListExtra("mUsers", mUsers);
-                                    startActivity(profileIntent);
-                                    hideProgress();
-                                }
-                            });
-                            mRecyclerView.setAdapter(mUsersAdapter);
-                            initSearchSuggests();
-                        } catch (NullPointerException e) {
-                            Log.e(TAG, e.toString());
-                            showSnackbar(getString(R.string.error_null_pointer));
-                        } finally {
-                            hideProgress();
-                        }
-                    } else if (response.code()==404) {
-                        showSnackbar(getString(R.string.error_not_found));
-                    } else {
-                        showSnackbar(getString(R.string.error_unknown));
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<UserListRes> call, Throwable t) {
-                    //// TODO: обработать ошибки ретрофита
-                }
-            });
-
+    private void loadUsersFromDb() {
+        if (mDataManager.getUserListFromDb().size()==0) {
+            showSnackbar("Список пользователей не может быть загружен");
         } else {
-            mUsersAdapter = new UsersAdapter(mUsers, new UsersAdapter.UserViewHolder.CustomClickListener() {
-                @Override
-                public void onUserItemClickListener(int position) {
-                    //передаем данные в новую активити через Data Transfer Objects
-                    showProgress();
-                    UserDTO userDTO = new UserDTO(mUsers.get(position));
-                    Intent profileIntent = new Intent(UserListActivity.this, ProfileUserActivity.class);
-                    profileIntent.putExtra(ConstantManager.PARCELABLE_KEY, userDTO);
-                    //profileIntent.putParcelableArrayListExtra("mUsers", mUsers);
-                    startActivity(profileIntent);
-                    hideProgress();
-                }
-            });
-            mRecyclerView.setAdapter(mUsersAdapter);
-            initSearchSuggests();
-            hideProgress();
+            //поиск по базе
+            showUsers(mDataManager.getUserListFromDb());
         }
     }
 
@@ -179,7 +93,6 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
     private void setupToolbar() {
         setSupportActionBar(mToolbar);
         ActionBar actionBar = getSupportActionBar();
-
         if (actionBar!=null) {
             actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -187,72 +100,61 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
     }
 
     @Override
-    public boolean onQueryTextSubmit(String query) {
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextChange(String newText) {
-        if (mSuggestsAdapter != null) {
-            showSuggestList();
-            mSuggestsAdapter.filter(newText);
-            mSuggestsRecyclerView.scrollToPosition(0);
-        }
-        return true;
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.user_list_menu, menu);
-
-        MenuItem searchItem = menu.findItem(R.id.search);
-        mSearchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-        mSearchView.setOnQueryTextListener(this);
-        mSearchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.search_menu, menu);
+        mSearchitem = menu.findItem(R.id.search_action);
+        //подключаем SearchView не из библиотеки поддержки!
+        android.widget.SearchView searchView = (android.widget.SearchView) MenuItemCompat.getActionView(mSearchitem);
+        searchView.setQueryHint(getString(R.string.search_enter_user_name));
+        searchView.setOnQueryTextListener(new android.widget.SearchView.OnQueryTextListener() {
             @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    showSuggestList();
-                } else {
-                    hideSuggestList();
-                }
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                showUserByQuery(newText);
+                return false;
             }
         });
-        return true;
-//        getMenuInflater().inflate(R.menu.search_menu, menu);
-//        MenuItem searchItem = menu.findItem(R.id.search);
-//        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-//        searchView.setOnQueryTextListener(this);
-//        return true;
+        return super.onPrepareOptionsMenu(menu);
     }
 
-    private void showSuggestList() {
-        if (mSuggestsView.getVisibility() == View.GONE) {
-            mSuggestsView.setVisibility(View.VISIBLE);
-            mRecyclerView.setLayoutFrozen(true);
+    private void showUsers(List<User> users) {
+        mUsers = users;
+        mUsersAdapter = new UsersAdapter(mUsers, new UsersAdapter.UserViewHolder.CustomClickListener() {
+            @Override
+            public void onUserItemClickListener(int position) {
+                //передаем данные профиля конкретного пользователя в новую активити через Data Transfer Objects
+                showProgress();
+                UserDTO userDTO = new UserDTO(mUsers.get(position));
+                Intent profileIntent = new Intent(UserListActivity.this, ProfileUserActivity.class);
+                profileIntent.putExtra(ConstantManager.PARCELABLE_KEY, userDTO);
+                startActivity(profileIntent);
+                hideProgress();
+            }
+        });//чтобы view не перерисовывались findviewbyid не вызываются
+        mRecyclerView.swapAdapter(mUsersAdapter, false);
+    }
+
+    private void showUserByQuery (String query) {
+        mQuery = query;
+        //убираем задержку, если очищена строка поиска
+        if (query.isEmpty()) {
+            showUsers(mDataManager.getUserListByName(mQuery));
+        } else {
+
+            Runnable searchUsers = new Runnable() {
+                @Override
+                public void run() {
+                    showUsers(mDataManager.getUserListByName(mQuery));
+                }
+            };
+            //потушить все предыдущие вызовы getUserListByName через searchUsers
+            mHandler.removeCallbacks(searchUsers);
+            mHandler.postDelayed(searchUsers, ConstantManager.SEARCH_DELAY);
         }
     }
 
-    private void hideSuggestList() {
-        mSuggestsView.setVisibility(View.GONE);
-        mRecyclerView.setLayoutFrozen(false);
-    }
-
-    private void initSearchSuggests() {
-        for (int i = 0; i < mUsers.size(); i++) {
-            mSearchSuggests.add(new SuggestModel(mUsers.get(i).getFullName(), i));
-        }
-        mSuggestsRecyclerView = (RecyclerView) findViewById(R.id.search_suggests_rv);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        mSuggestsRecyclerView.setLayoutManager(layoutManager);
-        mSuggestsAdapter = new SuggestsAdapter(mSearchSuggests,
-                new SuggestsAdapter.SuggestViewHolder.OnSuggestionClickListener() {
-                    @Override
-                    public void onSuggestionClickListener(int position) {
-                        hideSuggestList();
-                        mRecyclerView.scrollToPosition(mSuggestsAdapter.getModel(position).getPosition());
-                    }
-                });
-        mSuggestsRecyclerView.setAdapter(mSuggestsAdapter);
-    }
 }

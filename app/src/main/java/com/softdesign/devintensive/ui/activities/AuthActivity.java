@@ -1,33 +1,37 @@
 package com.softdesign.devintensive.ui.activities;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.data.managers.UserModelManager;
-import com.softdesign.devintensive.data.network.FileUploadService;
 import com.softdesign.devintensive.data.network.GetUserService;
 import com.softdesign.devintensive.data.network.ServiceGenerator;
 import com.softdesign.devintensive.data.network.req.UserLoginReq;
 import com.softdesign.devintensive.data.network.res.GetUserRes;
-import com.softdesign.devintensive.data.network.res.UploadPhotoRes;
+import com.softdesign.devintensive.data.network.res.UserListRes;
 import com.softdesign.devintensive.data.network.res.UserModelRes;
+import com.softdesign.devintensive.data.storage.models.Repository;
+import com.softdesign.devintensive.data.storage.models.RepositoryDao;
+import com.softdesign.devintensive.data.storage.models.User;
+import com.softdesign.devintensive.data.storage.models.UserDao;
+import com.softdesign.devintensive.utils.AppConfig;
 import com.softdesign.devintensive.utils.NetworkStatusChecker;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.support.v7.app.AppCompatActivity;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -41,6 +45,9 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
     private DataManager mDataManager;
     private boolean autoLoginSuccess=false;
 
+    private RepositoryDao mRepositoryDao;
+    private UserDao mUserDao;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +55,9 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
         setContentView(R.layout.activity_auth);
 
         mDataManager = DataManager.getInstance();
+        mUserDao = mDataManager.getDaoSession().getUserDao();
+        mRepositoryDao = mDataManager.getDaoSession().getRepositoryDao();
+
 
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.main_coordinator_container);
         mSignIn = (Button) findViewById(R.id.login_btn);
@@ -77,7 +87,6 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
         }
-
     }
 
     private boolean checkAutoLogin (){
@@ -124,7 +133,6 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
                 InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(mLogin.getWindowToken(), 0);
                 imm.hideSoftInputFromWindow(mPassword.getWindowToken(), 0);
-
                 signIn();
                 break;
             case R.id.password_lost_tv:
@@ -140,14 +148,22 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
     private void rememberPassword (){
         Intent rememberIntent = new Intent (Intent.ACTION_VIEW, Uri.parse("http://devintensive.softdesign-apps.ru/forgotpass"));
         startActivity(rememberIntent);
-
     }
 
     private void loginSuccess (UserModelRes userModel){
         UserModelManager.saveUserModelToPreferenses(mDataManager, userModel);
         saveUserValues(userModel);
-        Intent loginIntent = new Intent(this, MainActivity.class);
-        startActivity(loginIntent);
+        //сохранение базы и вложенный запрос пользователей нужно вынести в отдельный поток
+        saveUserInDb();
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                //Intent loginIntent = new Intent(AuthActivity.this, MainActivity.class);
+                Intent loginIntent = new Intent(AuthActivity.this, UserListActivity.class);
+                startActivity(loginIntent);
+            }
+        }, AppConfig.START_DELAY);
     }
 
     private void loginSuccess (GetUserRes userModel){
@@ -172,16 +188,13 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
                         showSnackbar(getString(R.string.error_unknown));
                     }
                 }
-
                 @Override
                 public void onFailure(Call<UserModelRes> call, Throwable t) {
                     //// TODO: обработать ошибки ретрофита
-
                 }
             });
         } else {
             showSnackbar(getString(R.string.error_network_is_not_available));
-
         }
         hideProgress();
     }
@@ -203,4 +216,52 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
         };
         mDataManager.getPreferencesManager().saveUserProfileValues(userValues);
     }
+
+    private void saveUserInDb() {
+        Call<UserListRes> call = mDataManager.getUserListFromNetork();
+        call.enqueue(new Callback<UserListRes>() {
+            @Override
+            public void onResponse(Call<UserListRes> call, Response<UserListRes> response) {
+                try {
+                    if (response.code()==200) {
+                        List<Repository> allRepositories = new ArrayList<Repository>();
+                        List<User> allUsers = new ArrayList<User>();
+
+                        for (UserListRes.Datum  userRes : response.body().getData()) {
+                            //сохраняем список репозиториев каждого пользователя в общий список
+                            allRepositories.addAll(getRepoListFromUserRes(userRes));
+                            //сохраняем каждого пользователя в общий список
+                            allUsers.add(new User(userRes));
+                        }
+                        mRepositoryDao.insertOrReplaceInTx(allRepositories);
+                        mUserDao.insertOrReplaceInTx(allUsers);
+                    } else {
+                        showSnackbar(getString(R.string.error_user_list_receive));
+                        Log.e(TAG, "onResponse: " + String.valueOf(response.errorBody().source()));
+                    }
+                } catch (NullPointerException e) {
+                    e.printStackTrace();
+                } finally {
+                    //hideProgress();
+                }
+            }
+            @Override
+            public void onFailure(Call<UserListRes> call, Throwable t) {
+                //// TODO: обработать ошибки ретрофита
+            }
+        });
+    }
+
+    private List<Repository> getRepoListFromUserRes(UserListRes.Datum userData){
+        final String userId = userData.getId();
+
+        List<Repository> repositories = new ArrayList<>();
+        //UserListRes.Datum.Repo UserModelRes.Repo
+        for (UserListRes.Datum.Repo repositoryRes : userData.getRepositories().getRepo()) {
+            repositories.add(new Repository(repositoryRes, userId));
+        }
+        return repositories;
+    }
+
+
 }

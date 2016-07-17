@@ -1,7 +1,5 @@
 package com.softdesign.devintensive.utils;
 
-import android.content.IntentSender;
-
 public interface ConstantManager {
     String TAG_PREFIX="DEV ";
     String COLOR_MODE_KEY="COLOR_MODE_KEY";
@@ -40,6 +38,8 @@ public interface ConstantManager {
     int CAMERA_REQUEST_PERMISSION_CODE = 102;
     int PHONE_CALL_REQUEST_PERMISSION_CODE = 103;
 
-
     String PARCELABLE_KEY = "PARCELABLE_KEY";
+    int SEARCH_DELAY = 2000;
+    int CACHE_EXPIRE_DEFAULT = 86400;
+
 }

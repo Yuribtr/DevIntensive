@@ -44,5 +44,7 @@
     <string name="profile_view_btn">Просмотр профиля</string>
     <string name="error_not_found">ресурс не найден</string>
     <string name="error_null_pointer">ошибка указателя</string>
-    <string name="hint_search">Поиск</string>
+    <string name="hint_search">Поиск пользователя</string>
+    <string name="error_user_list_receive">Список пользователей не может быть получен</string>
+    <string name="search_enter_user_name">Введите имя пользователя</string>
 </resources>
