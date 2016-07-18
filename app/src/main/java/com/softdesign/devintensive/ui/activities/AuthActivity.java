@@ -55,14 +55,28 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
         mLogin = (EditText) findViewById(R.id.login_email_et);
         mPassword = (EditText) findViewById(R.id.login_password_et);
 
+        mLogin.setEnabled(false);
+        mPassword.setEnabled(false);
+        mSignIn.setEnabled(false);
+
         mRememberPassword.setOnClickListener(this);
         mSignIn.setOnClickListener(this);
+
+        showProgress();
+        showToastShort("Проверяем автовход");
+        //проверяем на возможность автовхода
         checkAutoLogin();
 
-        EditText editText = (EditText) findViewById(R.id.login_email_et);
-        editText.requestFocus();
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+        if (!autoLoginSuccess) {
+            hideProgress();
+            mLogin.setEnabled(true);
+            mPassword.setEnabled(true);
+            mSignIn.setEnabled(true);
+            EditText editText = (EditText) findViewById(R.id.login_email_et);
+            editText.requestFocus();
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+        }
 
     }
 
@@ -144,6 +158,7 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
     }
 
     private void signIn (){
+        showProgress();
         if (NetworkStatusChecker.isNetworkAvailable(this)) {
             Call<UserModelRes> call = mDataManager.loginUser(new UserLoginReq(mLogin.getText().toString(),mPassword.getText().toString()));
             call.enqueue(new Callback<UserModelRes>() {
@@ -168,6 +183,7 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
             showSnackbar(getString(R.string.error_network_is_not_available));
 
         }
+        hideProgress();
     }
 
     private void saveUserValues (UserModelRes userModel) {

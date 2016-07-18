@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/size_big_72">
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="@dimen/size_big_72"
+        android:layout_centerVertical="true">
+        <EditText
+            android:id="@+id/repository_et"
+            android:hint="Репозиторий"
+            android:inputType="textUri"
+            android:text="github.com/Yuribtr/DevIntensive"
+            android:enabled="false"
+            android:focusable="false"
+            style="@style/editText"/>
+    </android.support.design.widget.TextInputLayout>
+    <!--todo: 1.22 переделать под две TextView (для хинта и для репозитория)  - заменить EditText и TextInputLayout-->
+    <ImageView
+        android:id="@+id/git_btn"
+        style="@style/icon.right"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:src="@drawable/ic_visibility_black_24dp"/>
+
+</RelativeLayout>

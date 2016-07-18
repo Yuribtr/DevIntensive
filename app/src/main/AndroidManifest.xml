@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.softdesign.devintensive">
+          package="com.softdesign.devintensive">
 
     <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-feature android:name="android.hardware.camera2" android:required="false"/>
-    <uses-feature android:name="android.hardware.camera2.autofocus" android:required="false"/>
+
+    <uses-feature
+        android:name="android.hardware.camera2"
+        android:required="false"/>
+    <uses-feature
+        android:name="android.hardware.camera2.autofocus"
+        android:required="false"/>
+
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.CALL_PHONE"/>
     <uses-permission android:name="android.hardware.phone"/>
@@ -21,14 +27,29 @@
         <activity android:name=".ui.activities.MainActivity">
         </activity>
         <activity android:name=".ui.activities.AuthActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN"/> -->
+
+
+            <!-- <category android:name="android.intent.category.LAUNCHER"/> -->
+            <!-- </intent-filter> -->
+        </activity>
+        <activity android:name=".ui.activities.UserListActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
-
+        <activity android:name=".ui.activities.ProfileUserActivity"
+            android:parentActivityName=".ui.activities.UserListActivity">
+            <!--связь для перехода по кнопке назад-->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.activities.UserListActivity"/>
+            <!--обратная совместимость API<16-->
+        </activity>
     </application>
 
 </manifest>
