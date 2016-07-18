@@ -256,7 +256,7 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
         final String userId = userData.getId();
 
         List<Repository> repositories = new ArrayList<>();
-        //UserListRes.Datum.Repo UserModelRes.Repo
+
         for (UserListRes.Datum.Repo repositoryRes : userData.getRepositories().getRepo()) {
             repositories.add(new Repository(repositoryRes, userId));
         }

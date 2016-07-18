@@ -47,4 +47,6 @@
     <string name="hint_search">Поиск пользователя</string>
     <string name="error_user_list_receive">Список пользователей не может быть получен</string>
     <string name="search_enter_user_name">Введите имя пользователя</string>
+    <string name="exit_menu">Выход</string>
+    <string name="error_users_list_empty">Список пользователей не может быть загружен</string>
 </resources>

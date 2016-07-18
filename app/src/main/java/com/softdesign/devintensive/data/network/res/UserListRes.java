@@ -27,7 +27,7 @@ public class UserListRes implements Parcelable {
     }
 
     public class Datum implements Parcelable {
-
+        
         @SerializedName("_id")
         @Expose
         private String id;

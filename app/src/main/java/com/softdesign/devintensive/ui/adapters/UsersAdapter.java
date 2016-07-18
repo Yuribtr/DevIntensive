@@ -45,13 +45,10 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
         final String userPhoto;
         if (user.getPhoto().isEmpty()) {
             userPhoto="null";
-            Log.e(TAG, "onBindViewHolder: user with name "+ user.getFullName()+" has empty photo");
+            Log.e(TAG, " user with name "+ user.getFullName()+" has empty photo");
         } else {
             userPhoto = user.getPhoto();
         }
-
-
-
         DataManager.getInstance().getPicasso()
                 .load(userPhoto)
                 .error(holder.mDummy)
@@ -62,10 +59,11 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
                 .into(holder.userPhoto, new Callback() {
                         @Override
                         public void onSuccess() {
-                            Log.d(TAG, " load from cache");
+                            Log.d(TAG, " loaded user photo from cache");
                         }
                         @Override
                         public void onError() {
+                            Log.d(TAG, " can't load user photo from cache");
                             DataManager.getInstance().getPicasso()
                                     .load(userPhoto)
                                     .error(holder.mDummy)
@@ -75,12 +73,12 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
                                     .into(holder.userPhoto, new Callback() {
                                         @Override
                                         public void onSuccess() {
-
+                                            Log.d(TAG, " loaded user photo from network");
                                         }
 
                                         @Override
                                         public void onError() {
-
+                                            Log.d(TAG, " can't load user photo from network: "+userPhoto);
                                         }
                                     });
                         }

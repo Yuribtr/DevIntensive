@@ -3,6 +3,7 @@ package com.softdesign.devintensive.ui.activities;
 import android.content.Intent;
 import android.os.Handler;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 
@@ -15,6 +16,9 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
@@ -22,6 +26,8 @@ import com.softdesign.devintensive.data.storage.models.User;
 import com.softdesign.devintensive.data.storage.models.UserDTO;
 import com.softdesign.devintensive.ui.adapters.UsersAdapter;
 import com.softdesign.devintensive.utils.ConstantManager;
+import com.softdesign.devintensive.utils.TransformRoundedImage;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -29,12 +35,16 @@ public class UserListActivity extends BaseActivity {
     private static final String TAG = ConstantManager.TAG_PREFIX + " UserListActivity";
     private CoordinatorLayout mCoordinatorLayout;
     private Toolbar mToolbar;
-    private DrawerLayout mNavigationDrawer;
     private RecyclerView mRecyclerView;
     private DataManager mDataManager;
     private UsersAdapter mUsersAdapter;
     private List<User> mUsers;
     private MenuItem mSearchitem;
+    private NavigationView navigation_v;
+    private DrawerLayout drawer_l;
+    private DrawerLayout mNavigationDrawer;
+    private TextView  mUserFio, mUserEmail;
+    private ImageView avatar_iv;
 
     private String mQuery;
 
@@ -60,6 +70,20 @@ public class UserListActivity extends BaseActivity {
 
         mHandler = new Handler();
 
+        drawer_l = (DrawerLayout) findViewById(R.id.navigation_drawer);
+        navigation_v = (NavigationView) findViewById(R.id.navigation_view);
+        mUserFio = (TextView) navigation_v.getHeaderView(0).findViewById(R.id.user_name_txt);
+        mUserEmail = (TextView) navigation_v.getHeaderView(0).findViewById(R.id.user_email_txt);
+        avatar_iv = (ImageView) navigation_v.getHeaderView(0).findViewById(R.id.avatar);
+        if (avatar_iv != null)
+            Picasso.with(this)
+                    .load(mDataManager.getPreferencesManager().loadUserAvatar())
+                    .transform(new TransformRoundedImage())
+                    .into(avatar_iv);
+        //подгружаем ФИО и почту в боковое меню
+        mUserFio.setText(mDataManager.getPreferencesManager().loadUserFio());
+        mUserEmail.setText(mDataManager.getPreferencesManager().loadUserEmail());
+
         setupToolbar();
         setupDrawer();
         loadUsersFromDb();
@@ -78,16 +102,31 @@ public class UserListActivity extends BaseActivity {
     }
 
     private void loadUsersFromDb() {
-        if (mDataManager.getUserListFromDb().size()==0) {
-            showSnackbar("Список пользователей не может быть загружен");
+        //поиск по базе
+        mUsers = mDataManager.getUserListFromDb();
+        if (mUsers.size()==0) {
+            showSnackbar(getString(R.string.error_users_list_empty));
         } else {
-            //поиск по базе
-            showUsers(mDataManager.getUserListFromDb());
+            showUsers(mUsers);
         }
     }
 
     private void setupDrawer() {
-        //// TODO: реализовать переход в другое активити при клике по элементу меню в NavigationDrawer
+        NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
+        navigationView.setCheckedItem(R.id.team_menu);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+                                                             @Override
+                                                             public boolean onNavigationItemSelected(MenuItem item) {
+                                                                 if (item.getItemId()==R.id.user_profile_menu) {
+                                                                     Intent mainIntent = new Intent(UserListActivity.this, MainActivity.class);
+                                                                     startActivity(mainIntent);
+                                                                 }
+                                                                 item.setChecked(true);
+                                                                 mNavigationDrawer.closeDrawer(GravityCompat.START);
+                                                                 return false;
+                                                             }
+                                                         }
+        );
     }
 
     private void setupToolbar() {

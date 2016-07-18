@@ -155,7 +155,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         drawer_l = (DrawerLayout) findViewById(R.id.navigation_drawer);
         navigation_v = (NavigationView) findViewById(R.id.navigation_view);
-
         mUserFio = (TextView) navigation_v.getHeaderView(0).findViewById(R.id.user_name_txt);
         mUserEmail = (TextView) navigation_v.getHeaderView(0).findViewById(R.id.user_email_txt);
 
@@ -172,7 +171,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 .into(mProfileImage);
 
         avatar_iv = (ImageView) navigation_v.getHeaderView(0).findViewById(R.id.avatar);
-        //avatar_iv.setImageBitmap(RoundedAvatarDrawable.getRoundedBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.avatar)));
         if (avatar_iv != null)
             Picasso.with(this)
                     .load(mDataManager.getPreferencesManager().loadUserAvatar())
@@ -262,6 +260,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             }
         }
         return super.onKeyDown(keyCode, event);
+
+
     }
 
     @Override
@@ -285,12 +285,14 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     private void setupDrawer() {
         NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
+        navigationView.setCheckedItem(R.id.user_profile_menu);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
                                                              @Override
                                                              public boolean onNavigationItemSelected(MenuItem item) {
-                                                                 showSnackbar(item.getTitle().toString());
-                                                                 if (item.getItemId()==R.id.user_profile_menu) openSite2(ConstantManager.BASE_URL+"login");
-
+                                                                 if (item.getItemId()==R.id.team_menu) {
+                                                                     Intent mainIntent = new Intent(MainActivity.this, UserListActivity.class);
+                                                                     startActivity(mainIntent);
+                                                                 }
                                                                  item.setChecked(true);
                                                                  mNavigationDrawer.closeDrawer(GravityCompat.START);
                                                                  return false;
@@ -406,7 +408,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         mUserFio.setText(mDataManager.getPreferencesManager().loadUserFio());
         mUserEmail.setText(mDataManager.getPreferencesManager().loadUserEmail());
         //меняем заголовок программы
-        setTitle(mDataManager.getPreferencesManager().loadUserFio()+" App");
+        setTitle(mDataManager.getPreferencesManager().loadUserFio());
     }
 //сохраняем отредактированные поля
     private void saveUserFields() {
@@ -539,11 +541,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private void insertProfileImage(Uri selectedImage, int mode) {
         Picasso.with(this)
                 .load(mSelectedImage)
+                .fit()
                 .into(mProfileImage);
         ////TODO: сделать placeholder (1:38) трансформ и кроп
         mDataManager.getPreferencesManager().saveUserPhoto(selectedImage);
         
-        //// TODO: здесь посылаем фото на сервер
+        //здесь посылаем фото на сервер
         updateSiteProfileImage(selectedImage, mode);
     }
 
