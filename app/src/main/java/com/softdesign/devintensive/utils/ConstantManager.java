@@ -42,4 +42,7 @@ public interface ConstantManager {
     int SEARCH_DELAY = 2000;
     int CACHE_EXPIRE_DEFAULT = 86400;
 
+    byte FROM_GALLERY = 1;
+    byte FROM_CAMERA = 2;
+
 }

@@ -151,6 +151,10 @@ public class UserListActivity extends BaseActivity {
                                                                      Intent mainIntent = new Intent(UserListActivity.this, MainActivity.class);
                                                                      startActivity(mainIntent);
                                                                  }
+                                                                 if (item.getItemId()==R.id.clear_credentials) {
+                                                                     mDataManager.getPreferencesManager().clearAuthToken();
+                                                                     showToast(getString(R.string.token_deleted_message));
+                                                                 }
                                                                  item.setChecked(true);
                                                                  mNavigationDrawer.closeDrawer(GravityCompat.START);
                                                                  return false;

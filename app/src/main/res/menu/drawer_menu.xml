@@ -8,5 +8,11 @@
     <item android:id="@+id/team_menu"
           android:icon="@drawable/ic_people_black_24dp"
           android:title="@string/my_team_im"/>
+    <item android:title="@string/for_developers_only"
+          android:checkable="false"
+          android:enabled="false"/>
+    <item android:id="@+id/clear_credentials"
+          android:icon="@drawable/ic_remove_circle_outline_black_24dp"
+          android:title="@string/clear_credentials"/>
 </group>
 </menu>

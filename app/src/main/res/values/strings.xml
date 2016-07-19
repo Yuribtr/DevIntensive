@@ -35,20 +35,30 @@
     <string name="error_login_or_password">неверный логин или пароль</string>
     <string name="error_unknown">неизвестная ошибка входа</string>
     <string name="error_network_is_not_available">сеть недоступна, попробуйте позже</string>
-    <string name="success_photo_update_message">Фотография профиля успешно обновлена</string>
-    <string name="error_photo_update_message">Ошибка загрузки фото на сервер (404)</string>
-    <string name="error_token_message">Сохраненные данны входа устарели, войдите с паролем</string>
-    <string name="success_token_message">Сохраненные логин и токен действительны</string>
+    <string name="success_photo_update_message">фотография профиля успешно обновлена</string>
+    <string name="error_photo_update_message">ошибка загрузки фото на сервер (404)</string>
+    <string name="error_token_message">сохраненные данны входа устарели, войдите с паролем</string>
+    <string name="success_token_message">сохраненные логин и токен действительны</string>
     <string name="my_profile_mi">Мой профиль</string>
     <string name="my_team_im">Команда</string>
+    <string name="clear_credentials">Очистить данные входа</string>
     <string name="profile_view_btn">Просмотр профиля</string>
     <string name="error_not_found">ресурс не найден</string>
     <string name="error_null_pointer">ошибка указателя</string>
     <string name="hint_search">Поиск пользователя</string>
-    <string name="error_user_list_receive">Список пользователей не может быть получен</string>
+    <string name="error_user_list_receive">список пользователей не может быть получен</string>
     <string name="search_enter_user_name">Введите имя пользователя</string>
     <string name="exit_menu">Выход</string>
-    <string name="error_users_list_empty">Список пользователей пуст</string>
-    <string name="users_list_loading_message">Загружаем пользователей...</string>
+    <string name="error_users_list_empty">список пользователей пуст</string>
+    <string name="users_list_loading_message">загружаем пользователей...</string>
+    <string name="error_credintials_not_found_message">не найдены данные для входа, войдите с паролем</string>
+    <string name="error_internal_message">внутренняя ошибка загрузки пользователя</string>
+    <string name="success_user_list_load">список пользователей успешно загружен</string>
+    <string name="connecting_to_server_message">соединяемся с сервером...</string>
+    <string name="error_credintials_empty_message">логин или пароль не могут быть пустыми</string>
+    <string name="success_login_message">логин и пароль подошли</string>
+    <string name="for_developers_only">Для разработчиков</string>
+    <string name="token_deleted_message">токен удален</string>
+    <string name="user_profile_image_file_error">путь к изображению не существует</string>
 
 </resources>
