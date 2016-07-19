@@ -47,7 +47,9 @@ import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.data.network.FileUploadService;
 import com.softdesign.devintensive.data.network.ServiceGenerator;
 import com.softdesign.devintensive.data.network.res.UploadPhotoRes;
+import com.softdesign.devintensive.ui.views.AspectRatioImageView;
 import com.softdesign.devintensive.utils.ConstantManager;
+import com.softdesign.devintensive.utils.DevintensiveApplication;
 import com.softdesign.devintensive.utils.NetworkStatusChecker;
 import com.softdesign.devintensive.utils.TransformRoundedImage;
 import com.squareup.picasso.Picasso;
@@ -60,40 +62,30 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-
-
 public class MainActivity extends BaseActivity implements View.OnClickListener {
-
     private static final String TAG = ConstantManager.TAG_PREFIX + "Main Activity";
-
     private DataManager mDataManager;
     private int mCurrentEditMode = 0;
-
     private ImageView mCallBtn, mEmailBtn, mVkBtn, mGitBtn;
     private CoordinatorLayout mCoordinatorLayout;
     private Toolbar mToolbar;
     private DrawerLayout drawer_l;
     private DrawerLayout mNavigationDrawer;
     private FloatingActionButton mFab;
-
     private RelativeLayout mProfilePlaceholder;
     private CollapsingToolbarLayout mCollapsingToolbar;
     private AppBarLayout mAppBarLayout;
     private ImageView mProfileImage;
-
     private ImageView avatar_iv;
     private NavigationView navigation_v;
     private EditText mUserPhone, mUserMail, mUserVK, mUserGit, mUserBio;
     private List<EditText> mUserInfoViews;
-
     private TextView mUserValueRating, mUserValueCodeLines, mUserValueProjects, mUserFio, mUserEmail;
     private List<TextView> mUserValueViews;
-
     private AppBarLayout.LayoutParams mAppbarParams = null;
     private File mPhotoFile = null;
     private Uri mSelectedImage = null;
     private String mUserId;
-
     private MenuItem mUser_profile_menu;
 
 
@@ -104,29 +96,23 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 //        Log.d(TAG, "onCreate");
 
         mDataManager= DataManager.getInstance();
-
         mCallBtn = (ImageView) findViewById(R.id.call_btn);
         mEmailBtn = (ImageView) findViewById(R.id.email_btn);
         mVkBtn = (ImageView) findViewById(R.id.vk_btn);
         mGitBtn = (ImageView) findViewById(R.id.git_btn);
-
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.main_coordinator_container);
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         mNavigationDrawer = (DrawerLayout) findViewById(R.id.navigation_drawer);
         mFab = (FloatingActionButton) findViewById(R.id.fab);
-
-
         mProfilePlaceholder = (RelativeLayout) findViewById(R.id.profile_placeholder);
         mCollapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         mAppBarLayout = (AppBarLayout) findViewById(R.id.appbar_layout);
         mProfileImage = (ImageView) findViewById(R.id.user_photo_img);
-
         mUserPhone = (EditText) findViewById(R.id.phone_at);
         mUserMail = (EditText) findViewById(R.id.email_et);
         mUserVK = (EditText) findViewById(R.id.vk_et);
         mUserGit = (EditText) findViewById(R.id.repository_et);
         mUserBio = (EditText) findViewById(R.id.about_et);
-
         mUserValueRating = (TextView) findViewById(R.id.user_info_rating_tv);
         mUserValueCodeLines = (TextView) findViewById(R.id.user_info_code_lines_tv);
         mUserValueProjects = (TextView) findViewById(R.id.user_info_projects_tv);
@@ -139,12 +125,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         mUserInfoViews.add(mUserVK);
         mUserInfoViews.add(mUserGit);
         mUserInfoViews.add(mUserBio);
-
         mUserValueViews = new ArrayList<>();
         mUserValueViews.add(mUserValueRating);
         mUserValueViews.add(mUserValueCodeLines);
         mUserValueViews.add(mUserValueProjects);
-
         mCallBtn.setOnClickListener(this);
         mEmailBtn.setOnClickListener(this);
         mVkBtn.setOnClickListener(this);
@@ -167,13 +151,16 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         mUserId = mDataManager.getPreferencesManager().getUserId();
 
         Picasso.with(this).load(mDataManager.getPreferencesManager().loadUserPhoto())
-                .placeholder(R.drawable.userphoto)//// TODO: сделать placeholder (1:38) трансформ и кроп
+                .placeholder(R.drawable.userphoto)
+                .resize((int) DevintensiveApplication.getContext().getResources().getDimension(R.dimen.profile_image_size), (int) (DevintensiveApplication.getContext().getResources().getDimension(R.dimen.profile_image_size)/ AspectRatioImageView.getDefaultAspectRatio()))
+                .centerCrop()
                 .into(mProfileImage);
 
         avatar_iv = (ImageView) navigation_v.getHeaderView(0).findViewById(R.id.avatar);
         if (avatar_iv != null)
             Picasso.with(this)
                     .load(mDataManager.getPreferencesManager().loadUserAvatar())
+                    .fit()
                     .transform(new TransformRoundedImage())
                     .into(avatar_iv);
 

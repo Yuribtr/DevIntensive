@@ -17,7 +17,6 @@ import com.softdesign.devintensive.data.storage.models.User;
 import com.softdesign.devintensive.data.storage.models.UserDao;
 import com.softdesign.devintensive.utils.AppConfig;
 import com.softdesign.devintensive.utils.NetworkStatusChecker;
-
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -29,10 +28,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -44,7 +41,6 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
     private CoordinatorLayout mCoordinatorLayout;
     private DataManager mDataManager;
     private boolean autoLoginSuccess=false;
-
     private RepositoryDao mRepositoryDao;
     private UserDao mUserDao;
 

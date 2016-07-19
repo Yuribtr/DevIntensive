@@ -6,7 +6,6 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
-
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -16,10 +15,9 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-
+import com.redmadrobot.chronos.ChronosConnector;
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.data.storage.models.User;
@@ -28,7 +26,7 @@ import com.softdesign.devintensive.ui.adapters.UsersAdapter;
 import com.softdesign.devintensive.utils.ConstantManager;
 import com.softdesign.devintensive.utils.TransformRoundedImage;
 import com.squareup.picasso.Picasso;
-
+import com.softdesign.devintensive.data.database.ChronosLoadUsersFromDb;
 import java.util.List;
 
 public class UserListActivity extends BaseActivity {
@@ -45,15 +43,17 @@ public class UserListActivity extends BaseActivity {
     private DrawerLayout mNavigationDrawer;
     private TextView  mUserFio, mUserEmail;
     private ImageView avatar_iv;
-
     private String mQuery;
-
+    private ChronosConnector mConnector;
     private Handler mHandler;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mConnector = new ChronosConnector();
+        mConnector.onCreate(this, savedInstanceState);
+
         setContentView(R.layout.activity_user_list);
 
         mDataManager = DataManager.getInstance();
@@ -64,9 +64,6 @@ public class UserListActivity extends BaseActivity {
         mRecyclerView = (RecyclerView) findViewById(R.id.user_list);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(linearLayoutManager);
-
-
-//// TODO: восстанавливать данные при повороте экрана
 
         mHandler = new Handler();
 
@@ -90,6 +87,24 @@ public class UserListActivity extends BaseActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        mConnector.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        mConnector.onPause();
+        super.onPause();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mConnector.onSaveInstanceState(outState);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId()==android.R.id.home) {
             mNavigationDrawer.openDrawer(GravityCompat.START);
@@ -101,13 +116,28 @@ public class UserListActivity extends BaseActivity {
         Snackbar.make(mCoordinatorLayout, message, Snackbar.LENGTH_LONG).show();
     }
 
+    private void showSnackbar(String message, int duration) {
+        Snackbar.make(mCoordinatorLayout, message, Snackbar.LENGTH_LONG).show();
+    }
+
     private void loadUsersFromDb() {
-        //поиск по базе
-        mUsers = mDataManager.getUserListFromDb();
-        if (mUsers.size()==0) {
-            showSnackbar(getString(R.string.error_users_list_empty));
+        //поиск по базе в отдельном потоке Chronos
+        showProgress();
+        mConnector.runOperation (new ChronosLoadUsersFromDb(), false);
+        showSnackbar(getString(R.string.users_list_loading_message), 3000);
+    }
+
+    public void onOperationFinished(final ChronosLoadUsersFromDb.Result result) {
+        hideProgress();
+        if (result.isSuccessful()) {
+            mUsers = result.getOutput();
+            if (mUsers.size()==0) {
+                showSnackbar(getString(R.string.error_users_list_empty));
+            } else {
+                showUsers(mUsers);
+            }
         } else {
-            showUsers(mUsers);
+            showSnackbar(getString(R.string.error_user_list_receive));
         }
     }
 
