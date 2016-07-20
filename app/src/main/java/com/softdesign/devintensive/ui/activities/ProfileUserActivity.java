@@ -16,7 +16,6 @@ import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.data.storage.models.UserDTO;
@@ -44,7 +43,6 @@ public class ProfileUserActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile_user);
-
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         mProfileImage = (ImageView) findViewById(R.id.user_photo_img);
         mUserBio = (EditText) findViewById(R.id.about_et);
@@ -54,7 +52,6 @@ public class ProfileUserActivity extends BaseActivity {
         mCollapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.main_coordinator_container);
         mRepoListView = (ListView) findViewById(R.id.repositories_list);//static_profile_content
-
         setupToolbar();
         initProfileData();
     }
@@ -62,7 +59,6 @@ public class ProfileUserActivity extends BaseActivity {
     private void setupToolbar() {
         setSupportActionBar(mToolbar);
         ActionBar actionBar = getSupportActionBar();
-
         if (actionBar!=null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
@@ -70,14 +66,15 @@ public class ProfileUserActivity extends BaseActivity {
 
     private void initProfileData(){
         UserDTO userDTO = getIntent().getParcelableExtra(ConstantManager.PARCELABLE_KEY);
-
+        //получаем из ЭКСТРЫ переданные данные из другого активити
         final List<String> repositories = userDTO.getRepositories();
         final RepositoriesAdapter repositoriesAdapter = new RepositoriesAdapter(this, repositories);
         final String userPhotoUri;
-
+        //подключаем адаптер обработки списка репозиториев
         mRepoListView.setAdapter(repositoriesAdapter);
+        //небольшой хак для установки высоты списка репозиториев
         setListViewHeightBasedOnItems(mRepoListView);
-
+        //обработчик клика по пункту репозитория с переходом на интернет страницу
         mRepoListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -86,19 +83,19 @@ public class ProfileUserActivity extends BaseActivity {
                 startActivity(browseIntent);
             }
         });
-
+        //инициализация полей профиля
         mUserBio.setText(userDTO.getBio());
         mUserRating.setText(userDTO.getRating());
         mUserCodeLines.setText(userDTO.getCodeLines());
         mUserProjects.setText(userDTO.getProjects());
         mCollapsingToolbarLayout.setTitle(userDTO.getFullName());
-
         if (userDTO.getPhoto().isEmpty()) {
             userPhotoUri="null";
             Log.e(TAG, " user with name "+ userDTO.getFullName()+" has empty photo");
         } else {
             userPhotoUri = userDTO.getPhoto();
         }
+        //сначала пробуем взять фото из кеша, при неудаче грузим из сети, делаем ресайз для соблюдения пропорций
         DataManager.getInstance().getPicasso()
                 .load(userPhotoUri)
                 .error(R.drawable.user_bg)

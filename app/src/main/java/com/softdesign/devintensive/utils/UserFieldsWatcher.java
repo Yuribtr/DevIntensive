@@ -11,8 +11,10 @@ import com.softdesign.devintensive.R;
 import java.util.regex.Pattern;
 
 public class UserFieldsWatcher implements android.text.TextWatcher {
-    private int maskType;
-    public EditText editText;
+    private int mMaskType;
+    public EditText mEditText;
+    private int mColor;
+    //задаем паттерны в формате RegExp
     private Pattern sPattern1 = Pattern.compile(ConstantManager.PATTERN_PHONE);
     private Pattern sPattern2 = Pattern.compile(ConstantManager.PATTERN_EMAIL);
     private Pattern sPattern3 = Pattern.compile(ConstantManager.PATTERN_VK_URL);
@@ -20,13 +22,15 @@ public class UserFieldsWatcher implements android.text.TextWatcher {
 
     public UserFieldsWatcher(EditText editText, int maskType){
         super();
-        this.editText = editText;
-        this.maskType = maskType;
+        this.mEditText = editText;
+        this.mMaskType = maskType;
+        this.mColor = mEditText.getCurrentTextColor();
     }
 
     private boolean isValid(CharSequence s) {
         boolean res=true;
-        switch (maskType) {
+        //проверяем соотвествие паттерна введенным символам с учетом типа паттерна
+        switch (mMaskType) {
             case 1:
                 res=sPattern1.matcher(s).matches();
              break;
@@ -55,11 +59,11 @@ public class UserFieldsWatcher implements android.text.TextWatcher {
     @Override
     public void afterTextChanged(Editable s)
     {
-        if (!isValid(s)) {
-            editText.setTextColor(Color.RED);
+        if (!isValid(s)) {//если текст не подходит к паттерну, то делаем его красным
+            mEditText.setTextColor(Color.RED);
         }
-        else {
-            editText.setTextColor(Color.BLACK);
+        else {//если все хорошо, то возвращаем ранее сохраненный цвет
+            mEditText.setTextColor(mColor);
         }
     }
 

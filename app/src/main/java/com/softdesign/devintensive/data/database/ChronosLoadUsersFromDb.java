@@ -1,6 +1,7 @@
 package com.softdesign.devintensive.data.database;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.redmadrobot.chronos.ChronosOperation;
 import com.redmadrobot.chronos.ChronosOperationResult;
@@ -9,6 +10,7 @@ import com.softdesign.devintensive.data.storage.models.User;
 import com.softdesign.devintensive.data.storage.models.UserDao;
 import com.softdesign.devintensive.utils.DevintensiveApplication;
 
+import org.greenrobot.greendao.query.WhereCondition;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -16,22 +18,32 @@ import java.util.List;
 
 public class ChronosLoadUsersFromDb extends ChronosOperation<List<User>> {
     private DaoSession mDaoSession;
+    private String mLikeQuery="";
+
+    public ChronosLoadUsersFromDb(String likeQuery) {
+        mLikeQuery = likeQuery;
+    }
+
+    public ChronosLoadUsersFromDb() {
+
+    }
 
     @Nullable
     @Override
     //Chronos will run this method in a background thread, which means you can put
     //any time-consuming calls here, as it will not affect UI thread performance
     public List<User> run() {
-        //имитируем длительную загрузку пользователей
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-        }
         mDaoSession = DevintensiveApplication.getDaoSession();
         List<User> userList = new ArrayList<>();
+        WhereCondition likeWhere;
+        //Log.d("ChronosLoadUsersFromDb", " searching "+mLikeQuery);
+        if (mLikeQuery.isEmpty())
+            likeWhere = UserDao.Properties.SearchName.like("%");
+        else
+            likeWhere = UserDao.Properties.SearchName.like("%" + mLikeQuery.toUpperCase() + "%");
         try {
             userList = mDaoSession.queryBuilder(User.class)
-                    .where(UserDao.Properties.CodeLines.gt(0))
+                    .where(UserDao.Properties.CodeLines.gt(0), likeWhere)
                     .orderDesc(UserDao.Properties.CodeLines)
                     .build()
                     .list();

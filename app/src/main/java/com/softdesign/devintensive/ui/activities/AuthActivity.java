@@ -64,6 +64,12 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
     }
 
     @Override
+    public void onBackPressed() {
+        // временное решение, чтобы случайно не выскочить на заставку
+        moveTaskToBack(true);
+    }
+
+    @Override
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.login_btn:

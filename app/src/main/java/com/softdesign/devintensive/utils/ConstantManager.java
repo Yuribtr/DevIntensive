@@ -13,6 +13,7 @@ public interface ConstantManager {
     String USER_ABOUT_KEY="USER_ABOUT_KEY";
     String USER_PHOTO_KEY = "USER_PHOTO_KEY";
     String EMAIL_TYPE = "message/rfc822";
+    String EMAIL_TYPE_2 = "text/plain";
     String FILE_TYPE_IMAGE = "image/*";
     String FILE_MIME_TYPE_IMAGE = "image/jpeg";
     String FILE_NAME_TYPE = "yyyyMMdd_HHmmss";

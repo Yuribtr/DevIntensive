@@ -56,8 +56,9 @@ public class SplashActivity extends BaseActivity{
         hideProgress();
         if (result.isSuccessful()) {
             mSplashMessage.setText(result.getOutput());
-            Intent loginIntent = new Intent(SplashActivity.this, MainActivity.class);
-            startActivity(loginIntent);
+            //если все в порядке - переходим в главное активити
+            Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+            startActivity(intent);
         } else {
             //ошибки кроноса выведутся здесь
             showToast(getString(R.string.error_internal_message)+" at ChronosSaveUsersToDb");
@@ -81,6 +82,5 @@ public class SplashActivity extends BaseActivity{
         super.onSaveInstanceState(outState);
         mConnector.onSaveInstanceState(outState);
     }
-
 
 }

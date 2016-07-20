@@ -22,7 +22,6 @@ import retrofit2.Response;
 public class ChronosAutoLogin extends ChronosOperation<String> {
     private DataManager mDataManager;
     private Context mContext;
-    private UserModelRes userModel;
     private String result="null";
 
     @Nullable
@@ -38,13 +37,12 @@ public class ChronosAutoLogin extends ChronosOperation<String> {
         mContext= DevintensiveApplication.getContext();
         mDataManager = DataManager.getInstance();
         if (NetworkStatusChecker.isNetworkAvailable(mContext)) {
-            GetUserService service = ServiceGenerator.createService(GetUserService.class);
             String userId = mDataManager.getPreferencesManager().getUserId();
             String authToken = mDataManager.getPreferencesManager().getAuthToken();
             if (userId.isEmpty() || authToken.isEmpty()) {
                 result = mContext.getString(R.string.error_credintials_not_found_message);
             } else {
-                Call<GetUserRes> call = service.getUser(userId);
+                Call<GetUserRes> call = mDataManager.getUser(userId);
                 try {
                     Response<GetUserRes> response = call.execute();
                     if (response.code() == 200) {

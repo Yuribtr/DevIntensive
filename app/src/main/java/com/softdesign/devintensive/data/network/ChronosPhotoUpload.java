@@ -44,8 +44,6 @@ public class ChronosPhotoUpload extends ChronosOperation<String> {
         mContext= DevintensiveApplication.getContext();
         mDataManager = DataManager.getInstance();
         if (NetworkStatusChecker.isNetworkAvailable(mContext)) {
-
-            FileUploadService service = ServiceGenerator.createService(FileUploadService.class);
             File file=null;
             switch (mMode) {
                 case 1://если фото пришло с галлереи то преобразуем его путь
@@ -60,7 +58,7 @@ public class ChronosPhotoUpload extends ChronosOperation<String> {
             } else {
                 RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
                 MultipartBody.Part body = MultipartBody.Part.createFormData("photo", file.getName(), requestFile);
-                Call<UploadPhotoRes> call = service.uploadPhoto(mUserId, body);
+                Call<UploadPhotoRes> call = mDataManager.uploadPhoto(mUserId, body);
                 try {
                     Response<UploadPhotoRes> response = call.execute();
                     if (response.code() == 200) {
