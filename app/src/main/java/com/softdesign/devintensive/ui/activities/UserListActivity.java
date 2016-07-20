@@ -1,5 +1,6 @@
 package com.softdesign.devintensive.ui.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -20,7 +21,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
+import com.softdesign.devintensive.data.network.ChronosLoadProfileImages;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -62,6 +63,7 @@ public class UserListActivity extends BaseActivity {
     private ChronosConnector mConnector;
     private Handler mHandler;
     private Runnable mSearchUsers;
+    private Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -191,8 +193,8 @@ public class UserListActivity extends BaseActivity {
     public void onOperationFinished(final ChronosLoadUsersFromDb.Result result) {
         if (result.isSuccessful()) {
             mUsers = result.getOutput();
-            if (mUsers.size()==0) {
-                showSnackbar(getString(R.string.error_users_list_empty));
+            if (mUsers==null) {
+                showSnackbar(getString(R.string.error_internal_message));
             } else {
                 showUsers(mUsers);
             }
@@ -231,21 +233,25 @@ public class UserListActivity extends BaseActivity {
     }
 
     private void showUsers(List<User> users) {
-        mUsers = users;
-        mUsersAdapter = new UsersAdapter(mUsers, new UsersAdapter.UserViewHolder.CustomClickListener() {
-            @Override
-            public void onUserItemClickListener(int position) {
-                //передаем данные профиля конкретного пользователя в новую активити через Data Transfer Objects
-                showProgress();
-                UserDTO userDTO = new UserDTO(mUsers.get(position));
-                Intent profileIntent = new Intent(UserListActivity.this, ProfileUserActivity.class);
-                profileIntent.putExtra(ConstantManager.PARCELABLE_KEY, userDTO);
-                //переходим в просмотр чужого профиля
-                startActivity(profileIntent);
-                hideProgress();
+        if (users!=null) {
+            //showProgress();
+            mUsers = users;
+            mConnector.runOperation (new ChronosLoadProfileImages(mUsers, mContext), false);
+        }
+    }
+
+    public void onOperationFinished(final ChronosLoadProfileImages.Result result) {
+        if (result.isSuccessful()) {
+            mUsersAdapter = result.getOutput();
+            if (mUsersAdapter==null) {
+                showSnackbar(getString(R.string.error_internal_message));
+            } else {
+                mRecyclerView.swapAdapter(mUsersAdapter, false);
             }
-        });//чтобы view не перерисовывались findviewbyid не вызываются
-        mRecyclerView.swapAdapter(mUsersAdapter, false);
+        } else {
+            showSnackbar(getString(R.string.error_user_list_receive));
+        }
+        //hideProgress();
     }
 
     /**

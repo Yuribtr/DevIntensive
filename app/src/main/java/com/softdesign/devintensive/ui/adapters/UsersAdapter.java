@@ -24,7 +24,7 @@ import java.util.List;
 public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHolder> {
     private static final String TAG = ConstantManager.TAG_PREFIX+" UsersAdapter";
     private Context mContext;
-    private List<User> mUsers;//01:02 #7
+    private List<User> mUsers;
     private UserViewHolder.CustomClickListener mCustomClickListener;
 
     public UsersAdapter(List<User> users, UserViewHolder.CustomClickListener customClickListener) {
@@ -75,7 +75,6 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
                                         public void onSuccess() {
                                             Log.d(TAG, " loaded user photo from network");
                                         }
-
                                         @Override
                                         public void onError() {
                                             Log.d(TAG, " can't load user photo from network: "+userPhoto);
@@ -83,7 +82,6 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
                                     });
                         }
                     });
-
         holder.mFullname.setText(user.getFullName());
         holder.mRating.setText(String.valueOf(user.getRating()));
         holder.mCodeLines.setText(String.valueOf(user.getCodeLines()));
@@ -108,13 +106,11 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
         protected TextView mFullname, mRating, mCodeLines, mProjects, mBio;
         protected Button mShowMore;
         protected Drawable mDummy;
-
         private CustomClickListener mListener;
 
         public UserViewHolder(View itemView, CustomClickListener customClickListener) {
             super(itemView);
             this.mListener = customClickListener;
-
             userPhoto = (AspectRatioImageView) itemView.findViewById(R.id.user_photo);
             mFullname = (TextView) itemView.findViewById(R.id.user_full_name_txt);
             mRating = (TextView) itemView.findViewById(R.id.rating_txt);
@@ -122,10 +118,8 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
             mProjects = (TextView) itemView.findViewById(R.id.projects_txt);
             mBio = (TextView) itemView.findViewById(R.id.bio_txt);
             mShowMore = (Button) itemView.findViewById(R.id.more_info_btn);
-
             mDummy = userPhoto.getContext().getResources().getDrawable(R.drawable.user_bg);
             mShowMore.setOnClickListener(this);
-
         }
 
         @Override
@@ -133,7 +127,6 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
             if (mListener!=null) {
                 mListener.onUserItemClickListener(getAdapterPosition());
             }
-
         }
 
         public interface CustomClickListener {

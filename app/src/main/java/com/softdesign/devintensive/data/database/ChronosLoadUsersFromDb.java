@@ -36,7 +36,6 @@ public class ChronosLoadUsersFromDb extends ChronosOperation<List<User>> {
         mDaoSession = DevintensiveApplication.getDaoSession();
         List<User> userList = new ArrayList<>();
         WhereCondition likeWhere;
-        //Log.d("ChronosLoadUsersFromDb", " searching "+mLikeQuery);
         if (mLikeQuery.isEmpty())
             likeWhere = UserDao.Properties.SearchName.like("%");
         else
