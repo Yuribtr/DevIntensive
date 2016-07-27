@@ -27,7 +27,7 @@ public class UserListRes implements Parcelable {
     }
 
     public class Datum implements Parcelable {
-
+        
         @SerializedName("_id")
         @Expose
         private String id;
@@ -55,6 +55,10 @@ public class UserListRes implements Parcelable {
         @SerializedName("updated")
         @Expose
         private String updated;
+
+        public String getId() {
+            return id;
+        }
 
         public PublicInfo getPublicInfo() {
             return publicInfo;
@@ -140,6 +144,10 @@ public class UserListRes implements Parcelable {
 
             public String getGit() {
                 return git;
+            }
+
+            public String getId() {
+                return id;
             }
 
             protected Repo(Parcel in) {
@@ -344,8 +352,6 @@ public class UserListRes implements Parcelable {
             }
         };
     }
-
-
 
 
     protected UserListRes(Parcel in) {

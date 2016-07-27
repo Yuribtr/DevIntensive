@@ -2,9 +2,9 @@ package com.softdesign.devintensive.data.network.interceptors;
 
 import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.data.managers.PreferencesManager;
+import com.softdesign.devintensive.utils.ConstantManager;
 
 import java.io.IOException;
-
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -18,7 +18,8 @@ public class HeaderInterceptor implements Interceptor {
 
         Request.Builder requestBuilder = original.newBuilder().header("X-Access-Token", pm.getAuthToken())
                 .header("Request-User-Id", pm.getUserId())
-                .header("User-Agent", "DevIntensiveApp");
+                .header("User-Agent", "DevIntensiveApp")
+                .header("Cache-Control", "max-age="+ ConstantManager.CACHE_EXPIRE_DEFAULT);
 
         Request request = requestBuilder.build();
         return chain.proceed(request);

@@ -93,6 +93,11 @@ public class PreferencesManager {
         editor.putString(ConstantManager.AUTH_TOKEN_KEY, authToken);
         editor.apply();
     }
+    public void clearAuthToken (){
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putString(ConstantManager.AUTH_TOKEN_KEY, "");
+        editor.apply();
+    }
 
     public String getAuthToken (){
         return mSharedPreferences.getString(ConstantManager.AUTH_TOKEN_KEY, "null");

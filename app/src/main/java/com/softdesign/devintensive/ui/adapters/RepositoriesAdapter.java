@@ -43,7 +43,7 @@ public class RepositoriesAdapter extends BaseAdapter {
         if (itemView==null) {
             itemView = mInflater.inflate(R.layout.item_repositories_list, parent, false);
         }
-        TextView repoName = (TextView) itemView.findViewById(R.id.repository_et);//// TODO: передлать в разметке на TextView
+        TextView repoName = (TextView) itemView.findViewById(R.id.repository_et);
         repoName.setText(mRepoList.get(position));
         return itemView;
     }
