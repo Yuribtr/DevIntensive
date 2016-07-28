@@ -1,8 +1,5 @@
 package com.softdesign.devintensive.data.storage.models;
 
-
-import com.softdesign.devintensive.data.network.res.UserListRes;
-
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.NotNull;
@@ -10,25 +7,32 @@ import org.greenrobot.greendao.annotation.Unique;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.DaoException;
 
-@Entity(active = true, nameInDb = "REPOSITORIES")
-public class Repository {
+@Entity(active = true, nameInDb = "LIKESBY")
+public class LikesBy {
 
     @Id
     private Long id;
 
-    @NotNull
-    @Unique
-    private String remoteId;
-
-    private String repositoryName;
+    private String userLiked;
 
     private String userRemoteId;
 
-    public Repository(UserListRes.Repo repositoryRes, String userId) {
-        this.repositoryName = repositoryRes.getGit();
-        this.userRemoteId = userId;
-        this.remoteId = repositoryRes.getId();
+    /** Used for active entity operations. */
+    @Generated(hash = 1721354425)
+    private transient LikesByDao myDao;
+
+    /** Used to resolve relations */
+    @Generated(hash = 2040040024)
+    private transient DaoSession daoSession;
+
+
+
+    public LikesBy(String userLiked, String userRemoteId) {
+        this.userLiked = userLiked;
+        this.userRemoteId = userRemoteId;
     }
+
+
 
     /**
      * Convenient call for {@link org.greenrobot.greendao.AbstractDao#refresh(Object)}.
@@ -42,6 +46,8 @@ public class Repository {
         myDao.refresh(this);
     }
 
+
+
     /**
      * Convenient call for {@link org.greenrobot.greendao.AbstractDao#update(Object)}.
      * Entity must attached to an entity context.
@@ -53,6 +59,8 @@ public class Repository {
         }
         myDao.update(this);
     }
+
+
 
     /**
      * Convenient call for {@link org.greenrobot.greendao.AbstractDao#delete(Object)}.
@@ -66,64 +74,67 @@ public class Repository {
         myDao.delete(this);
     }
 
+
+
     /** called by internal mechanisms, do not call yourself. */
-    @Generated(hash = 636002579)
+    @Generated(hash = 122203027)
     public void __setDaoSession(DaoSession daoSession) {
         this.daoSession = daoSession;
-        myDao = daoSession != null ? daoSession.getRepositoryDao() : null;
+        myDao = daoSession != null ? daoSession.getLikesByDao() : null;
     }
 
-    /** Used for active entity operations. */
-    @Generated(hash = 332345895)
-    private transient RepositoryDao myDao;
 
-    /** Used to resolve relations */
-    @Generated(hash = 2040040024)
-    private transient DaoSession daoSession;
 
     public String getUserRemoteId() {
         return this.userRemoteId;
     }
 
+
+
     public void setUserRemoteId(String userRemoteId) {
         this.userRemoteId = userRemoteId;
     }
 
-    public String getRepositoryName() {
-        return this.repositoryName;
+
+
+    public String getUserLiked() {
+        return this.userLiked;
     }
 
-    public void setRepositoryName(String repositoryName) {
-        this.repositoryName = repositoryName;
+
+
+    public void setUserLiked(String userLiked) {
+        this.userLiked = userLiked;
     }
 
-    public String getRemoteId() {
-        return this.remoteId;
-    }
 
-    public void setRemoteId(String remoteId) {
-        this.remoteId = remoteId;
-    }
 
     public Long getId() {
         return this.id;
     }
 
+
+
     public void setId(Long id) {
         this.id = id;
     }
 
-    @Generated(hash = 1976272162)
-    public Repository(Long id, @NotNull String remoteId, String repositoryName,
-            String userRemoteId) {
+
+
+    @Generated(hash = 823762358)
+    public LikesBy(Long id, String userLiked, String userRemoteId) {
         this.id = id;
-        this.remoteId = remoteId;
-        this.repositoryName = repositoryName;
+        this.userLiked = userLiked;
         this.userRemoteId = userRemoteId;
     }
 
-    @Generated(hash = 984204935)
-    public Repository() {
+
+
+    @Generated(hash = 991161490)
+    public LikesBy() {
     }
 
+
+
 }
+

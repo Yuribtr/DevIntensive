@@ -28,9 +28,12 @@ public class UserDao extends AbstractDao<User, Long> {
         public final static Property FullName = new Property(3, String.class, "fullName", false, "FULL_NAME");
         public final static Property SearchName = new Property(4, String.class, "searchName", false, "SEARCH_NAME");
         public final static Property Rating = new Property(5, int.class, "rating", false, "RATING");
-        public final static Property CodeLines = new Property(6, int.class, "codeLines", false, "CODE_LINES");
-        public final static Property Projects = new Property(7, int.class, "projects", false, "PROJECTS");
-        public final static Property Bio = new Property(8, String.class, "bio", false, "BIO");
+        public final static Property LikesCount = new Property(6, int.class, "likesCount", false, "LIKES_COUNT");
+        public final static Property CodeLines = new Property(7, int.class, "codeLines", false, "CODE_LINES");
+        public final static Property Projects = new Property(8, int.class, "projects", false, "PROJECTS");
+        public final static Property IsMyLike = new Property(9, boolean.class, "isMyLike", false, "IS_MY_LIKE");
+        public final static Property Bio = new Property(10, String.class, "bio", false, "BIO");
+        public final static Property Index = new Property(11, Long.class, "index", false, "INDEX");
     };
 
     private DaoSession daoSession;
@@ -55,9 +58,12 @@ public class UserDao extends AbstractDao<User, Long> {
                 "\"FULL_NAME\" TEXT NOT NULL UNIQUE ," + // 3: fullName
                 "\"SEARCH_NAME\" TEXT NOT NULL UNIQUE ," + // 4: searchName
                 "\"RATING\" INTEGER NOT NULL ," + // 5: rating
-                "\"CODE_LINES\" INTEGER NOT NULL ," + // 6: codeLines
-                "\"PROJECTS\" INTEGER NOT NULL ," + // 7: projects
-                "\"BIO\" TEXT);"); // 8: bio
+                "\"LIKES_COUNT\" INTEGER NOT NULL ," + // 6: likesCount
+                "\"CODE_LINES\" INTEGER NOT NULL ," + // 7: codeLines
+                "\"PROJECTS\" INTEGER NOT NULL ," + // 8: projects
+                "\"IS_MY_LIKE\" INTEGER NOT NULL ," + // 9: isMyLike
+                "\"BIO\" TEXT," + // 10: bio
+                "\"INDEX\" INTEGER);"); // 11: index
     }
 
     /** Drops the underlying database table. */
@@ -83,12 +89,19 @@ public class UserDao extends AbstractDao<User, Long> {
         stmt.bindString(4, entity.getFullName());
         stmt.bindString(5, entity.getSearchName());
         stmt.bindLong(6, entity.getRating());
-        stmt.bindLong(7, entity.getCodeLines());
-        stmt.bindLong(8, entity.getProjects());
+        stmt.bindLong(7, entity.getLikesCount());
+        stmt.bindLong(8, entity.getCodeLines());
+        stmt.bindLong(9, entity.getProjects());
+        stmt.bindLong(10, entity.getIsMyLike() ? 1L: 0L);
  
         String bio = entity.getBio();
         if (bio != null) {
-            stmt.bindString(9, bio);
+            stmt.bindString(11, bio);
+        }
+ 
+        Long index = entity.getIndex();
+        if (index != null) {
+            stmt.bindLong(12, index);
         }
     }
 
@@ -109,12 +122,19 @@ public class UserDao extends AbstractDao<User, Long> {
         stmt.bindString(4, entity.getFullName());
         stmt.bindString(5, entity.getSearchName());
         stmt.bindLong(6, entity.getRating());
-        stmt.bindLong(7, entity.getCodeLines());
-        stmt.bindLong(8, entity.getProjects());
+        stmt.bindLong(7, entity.getLikesCount());
+        stmt.bindLong(8, entity.getCodeLines());
+        stmt.bindLong(9, entity.getProjects());
+        stmt.bindLong(10, entity.getIsMyLike() ? 1L: 0L);
  
         String bio = entity.getBio();
         if (bio != null) {
-            stmt.bindString(9, bio);
+            stmt.bindString(11, bio);
+        }
+ 
+        Long index = entity.getIndex();
+        if (index != null) {
+            stmt.bindLong(12, index);
         }
     }
 
@@ -138,9 +158,12 @@ public class UserDao extends AbstractDao<User, Long> {
             cursor.getString(offset + 3), // fullName
             cursor.getString(offset + 4), // searchName
             cursor.getInt(offset + 5), // rating
-            cursor.getInt(offset + 6), // codeLines
-            cursor.getInt(offset + 7), // projects
-            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8) // bio
+            cursor.getInt(offset + 6), // likesCount
+            cursor.getInt(offset + 7), // codeLines
+            cursor.getInt(offset + 8), // projects
+            cursor.getShort(offset + 9) != 0, // isMyLike
+            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // bio
+            cursor.isNull(offset + 11) ? null : cursor.getLong(offset + 11) // index
         );
         return entity;
     }
@@ -153,9 +176,12 @@ public class UserDao extends AbstractDao<User, Long> {
         entity.setFullName(cursor.getString(offset + 3));
         entity.setSearchName(cursor.getString(offset + 4));
         entity.setRating(cursor.getInt(offset + 5));
-        entity.setCodeLines(cursor.getInt(offset + 6));
-        entity.setProjects(cursor.getInt(offset + 7));
-        entity.setBio(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
+        entity.setLikesCount(cursor.getInt(offset + 6));
+        entity.setCodeLines(cursor.getInt(offset + 7));
+        entity.setProjects(cursor.getInt(offset + 8));
+        entity.setIsMyLike(cursor.getShort(offset + 9) != 0);
+        entity.setBio(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
+        entity.setIndex(cursor.isNull(offset + 11) ? null : cursor.getLong(offset + 11));
      }
     
     @Override

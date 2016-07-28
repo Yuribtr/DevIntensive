@@ -8,9 +8,11 @@ import org.greenrobot.greendao.database.Database;
 import org.greenrobot.greendao.identityscope.IdentityScopeType;
 import org.greenrobot.greendao.internal.DaoConfig;
 
+import com.softdesign.devintensive.data.storage.models.LikesBy;
 import com.softdesign.devintensive.data.storage.models.Repository;
 import com.softdesign.devintensive.data.storage.models.User;
 
+import com.softdesign.devintensive.data.storage.models.LikesByDao;
 import com.softdesign.devintensive.data.storage.models.RepositoryDao;
 import com.softdesign.devintensive.data.storage.models.UserDao;
 
@@ -23,9 +25,11 @@ import com.softdesign.devintensive.data.storage.models.UserDao;
  */
 public class DaoSession extends AbstractDaoSession {
 
+    private final DaoConfig likesByDaoConfig;
     private final DaoConfig repositoryDaoConfig;
     private final DaoConfig userDaoConfig;
 
+    private final LikesByDao likesByDao;
     private final RepositoryDao repositoryDao;
     private final UserDao userDao;
 
@@ -33,22 +37,32 @@ public class DaoSession extends AbstractDaoSession {
             daoConfigMap) {
         super(db);
 
+        likesByDaoConfig = daoConfigMap.get(LikesByDao.class).clone();
+        likesByDaoConfig.initIdentityScope(type);
+
         repositoryDaoConfig = daoConfigMap.get(RepositoryDao.class).clone();
         repositoryDaoConfig.initIdentityScope(type);
 
         userDaoConfig = daoConfigMap.get(UserDao.class).clone();
         userDaoConfig.initIdentityScope(type);
 
+        likesByDao = new LikesByDao(likesByDaoConfig, this);
         repositoryDao = new RepositoryDao(repositoryDaoConfig, this);
         userDao = new UserDao(userDaoConfig, this);
 
+        registerDao(LikesBy.class, likesByDao);
         registerDao(Repository.class, repositoryDao);
         registerDao(User.class, userDao);
     }
     
     public void clear() {
+        likesByDaoConfig.getIdentityScope().clear();
         repositoryDaoConfig.getIdentityScope().clear();
         userDaoConfig.getIdentityScope().clear();
+    }
+
+    public LikesByDao getLikesByDao() {
+        return likesByDao;
     }
 
     public RepositoryDao getRepositoryDao() {

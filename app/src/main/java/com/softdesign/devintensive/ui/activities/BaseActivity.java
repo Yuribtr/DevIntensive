@@ -10,6 +10,7 @@ import android.widget.Toast;
 import com.softdesign.devintensive.R;
 
 import com.softdesign.devintensive.utils.ConstantManager;
+import com.softdesign.devintensive.utils.UiHelper;
 
 public class BaseActivity extends AppCompatActivity{
     static final String TAG = ConstantManager.TAG_PREFIX+"BaseActivity";
@@ -56,7 +57,7 @@ public class BaseActivity extends AppCompatActivity{
 
     public void showError(String message, Exception error){
         showToast(message);
-        Log.e(TAG, String.valueOf(error));
+        UiHelper.writeLog(String.valueOf(error));
     }
 
     public void showToast (String message){

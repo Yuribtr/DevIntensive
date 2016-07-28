@@ -2,6 +2,7 @@ package com.softdesign.devintensive.utils;
 
 
 import android.content.Context;
+import android.util.Log;
 import android.util.TypedValue;
 
 public class UiHelper {
@@ -35,6 +36,28 @@ public class UiHelper {
 
     public static float currentFriction (int start, int end, int currentValue){
         return (float) (currentValue-start)/(end-start);
+    }
+
+    public static void writeLog(String message){
+        if (ConstantManager.DEBUG_MODE) {
+            Log.d(ConstantManager.TAG_PREFIX, message);
+//            if (Thread.currentThread().getStackTrace()!=null && Thread.currentThread().getStackTrace().length>14){
+//                Log.d(ConstantManager.TAG_PREFIX, Thread.currentThread().getStackTrace()[13].getMethodName()+" "+ message);
+//            } else {
+//                Log.d(ConstantManager.TAG_PREFIX, message);
+//            }
+        }
+    }
+
+    public static void writeLog(String tag, String message){
+        if (ConstantManager.DEBUG_MODE) {
+            Log.d(ConstantManager.TAG_PREFIX + tag, message);
+//            if (Thread.currentThread().getStackTrace()!=null && Thread.currentThread().getStackTrace().length>14){
+//                Log.d(ConstantManager.TAG_PREFIX, Thread.currentThread().getStackTrace()[13].getMethodName()+" "+ message);
+//            } else {
+//                Log.d(ConstantManager.TAG_PREFIX, message);
+//            }
+        }
     }
 
 }

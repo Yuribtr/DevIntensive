@@ -5,6 +5,7 @@ public interface ConstantManager {
     String COLOR_MODE_KEY="COLOR_MODE_KEY";
     String EDIT_MODE_KEY = "EDIT_MODE_KEY";
     String BASE_URL = "http://devintensive.softdesign-apps.ru/";
+    boolean DEBUG_MODE = true;
 
     String USER_PHONE_KEY="USER_PHONE_KEY";
     String USER_MAIL_KEY="USER_MAIL_KEY";

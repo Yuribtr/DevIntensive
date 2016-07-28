@@ -11,6 +11,7 @@ import com.softdesign.devintensive.data.database.ChronosSaveUsersToDb;
 import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.data.network.ChronosAutoLogin;
 import com.softdesign.devintensive.utils.DevintensiveApplication;
+import com.softdesign.devintensive.utils.UiHelper;
 
 public class SplashActivity extends BaseActivity{
     private ChronosConnector mConnector;
@@ -29,6 +30,7 @@ public class SplashActivity extends BaseActivity{
         mDataManager = DataManager.getInstance();
         mSplashMessage = (TextView) findViewById(R.id.splash_message);
         mSplashMessage.setText(R.string.connecting_to_server_message);
+        UiHelper.writeLog(mContext.getString(R.string.connecting_to_server_message));
         //запускаем поток автовхода
         mConnector.runOperation(new ChronosAutoLogin(), false);
     }
@@ -38,15 +40,18 @@ public class SplashActivity extends BaseActivity{
             mSplashMessage.setText(result.getOutput());
             //если сохраненный токен подошел
             if (result.getOutput().equals(mContext.getString(R.string.success_token_message))){
+                UiHelper.writeLog(mContext.getString(R.string.success_token_message));
                 //запускаем поток загрузки списка в базу и перехода в главное активити
                 mConnector.runOperation(new ChronosSaveUsersToDb(), false);
             } else {
                 //если ошибочный пароль или токен или другая ошибка - кидаем на активити входа
+                UiHelper.writeLog(result.getOutput());
                 Intent loginIntent = new Intent(SplashActivity.this, AuthActivity.class);
                 startActivity(loginIntent);
             }
         } else {
             //ошибки кроноса выведутся здесь
+            UiHelper.writeLog(mContext.getString(R.string.error_internal_message));
             showToast(getString(R.string.error_internal_message)+" at ChronosAutoLogin");
             hideProgress();
         }
@@ -55,12 +60,14 @@ public class SplashActivity extends BaseActivity{
     public void onOperationFinished(final ChronosSaveUsersToDb.Result result) {
         hideProgress();
         if (result.isSuccessful()) {
+            UiHelper.writeLog(result.getOutput());
             mSplashMessage.setText(result.getOutput());
             //если все в порядке - переходим в главное активити
             Intent intent = new Intent(SplashActivity.this, MainActivity.class);
             startActivity(intent);
         } else {
             //ошибки кроноса выведутся здесь
+            UiHelper.writeLog(mContext.getString(R.string.error_internal_message));
             showToast(getString(R.string.error_internal_message)+" at ChronosSaveUsersToDb");
         }
     }

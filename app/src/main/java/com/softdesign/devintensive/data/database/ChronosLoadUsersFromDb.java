@@ -5,10 +5,12 @@ import android.util.Log;
 
 import com.redmadrobot.chronos.ChronosOperation;
 import com.redmadrobot.chronos.ChronosOperationResult;
+import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.data.storage.models.DaoSession;
 import com.softdesign.devintensive.data.storage.models.User;
 import com.softdesign.devintensive.data.storage.models.UserDao;
 import com.softdesign.devintensive.utils.DevintensiveApplication;
+import com.softdesign.devintensive.utils.UiHelper;
 
 import org.greenrobot.greendao.query.WhereCondition;
 import org.jetbrains.annotations.Nullable;
@@ -33,6 +35,7 @@ public class ChronosLoadUsersFromDb extends ChronosOperation<List<User>> {
     //Chronos will run this method in a background thread, which means you can put
     //any time-consuming calls here, as it will not affect UI thread performance
     public List<User> run() {
+        UiHelper.writeLog("ChronosLoadUsersFromDb called");
         mDaoSession = DevintensiveApplication.getDaoSession();
         List<User> userList = new ArrayList<>();
         WhereCondition likeWhere;
@@ -42,10 +45,22 @@ public class ChronosLoadUsersFromDb extends ChronosOperation<List<User>> {
             likeWhere = UserDao.Properties.SearchName.like("%" + mLikeQuery.toUpperCase() + "%");
         try {
             userList = mDaoSession.queryBuilder(User.class)
-                    .where(UserDao.Properties.CodeLines.gt(0), likeWhere)
+                    .where(likeWhere)
                     .orderDesc(UserDao.Properties.CodeLines)
                     .build()
                     .list();
+
+            //вручную инициализируем поле своего лайка
+            String mMyUserId = DataManager.getInstance().getPreferencesManager().getUserId();
+            for (int i=0; i<userList.size();i++) {
+                userList.get(i).setIsMyLike(false);
+                for (int k=0; k<userList.get(i).getUserLiked().size(); k++) {
+                    if (userList.get(i).getUserLiked().get(k).getUserLiked().equals(mMyUserId)) {
+                        userList.get(i).setIsMyLike(true);
+                    }
+                }
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }

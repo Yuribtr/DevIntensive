@@ -11,6 +11,8 @@ import com.softdesign.devintensive.data.network.ChronosLogin;
 import com.softdesign.devintensive.data.storage.models.RepositoryDao;
 import com.softdesign.devintensive.data.storage.models.UserDao;
 import com.softdesign.devintensive.utils.DevintensiveApplication;
+import com.softdesign.devintensive.utils.UiHelper;
+
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
@@ -112,14 +114,17 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
             //если сохраненный токен подошел
             if (result.getOutput().equals(mContext.getString(R.string.success_login_message))){
                 //запускаем поток загрузки списка в базу и перехода в главное активити
+                UiHelper.writeLog(mContext.getString(R.string.success_login_message));
                 mConnector.runOperation(new ChronosSaveUsersToDb(), false);
             } else {
                 //если ошибочный пароль или токен или другая ошибка выводим сообщение
+                UiHelper.writeLog(result.getOutput());
                 showSnackbar(result.getOutput());
                 hideProgress();
             }
         } else {
             //ошибки кроноса выведутся здесь
+            UiHelper.writeLog(mContext.getString(R.string.error_internal_message));
             showToast(getString(R.string.error_internal_message)+" at ChronosAutoLogin");
             hideProgress();
         }
@@ -128,10 +133,12 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
     public void onOperationFinished(final ChronosSaveUsersToDb.Result result) {
         hideProgress();
         if (result.isSuccessful()) {
+            UiHelper.writeLog(result.getOutput());
             Intent loginIntent = new Intent(AuthActivity.this, MainActivity.class);
             startActivity(loginIntent);
         } else {
             //ошибки кроноса выведутся здесь
+            UiHelper.writeLog(mContext.getString(R.string.error_internal_message));
             showToast(getString(R.string.error_internal_message)+" at ChronosSaveUsersToDb");
         }
     }

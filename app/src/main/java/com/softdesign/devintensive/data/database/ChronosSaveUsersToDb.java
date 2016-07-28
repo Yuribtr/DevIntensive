@@ -9,13 +9,17 @@ import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.data.network.res.UserListRes;
 import com.softdesign.devintensive.data.storage.models.DaoSession;
+import com.softdesign.devintensive.data.storage.models.LikesBy;
+import com.softdesign.devintensive.data.storage.models.LikesByDao;
 import com.softdesign.devintensive.data.storage.models.Repository;
 import com.softdesign.devintensive.data.storage.models.RepositoryDao;
 import com.softdesign.devintensive.data.storage.models.User;
 import com.softdesign.devintensive.data.storage.models.UserDao;
 import com.softdesign.devintensive.utils.DevintensiveApplication;
 import com.softdesign.devintensive.utils.NetworkStatusChecker;
+import com.softdesign.devintensive.utils.UiHelper;
 
+import org.greenrobot.greendao.query.DeleteQuery;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -26,9 +30,10 @@ import retrofit2.Response;
 
 public class ChronosSaveUsersToDb extends ChronosOperation<String> {
     private DataManager mDataManager;
-    private DaoSession mDaoSession;
     private Context mContext;
+    private DaoSession mDaoSession;
     private RepositoryDao mRepositoryDao;
+    private LikesByDao mLikesByDao;
     private UserDao mUserDao;
     private String result="null";
 
@@ -37,15 +42,14 @@ public class ChronosSaveUsersToDb extends ChronosOperation<String> {
     //Chronos will run this method in a background thread, which means you can put
     //any time-consuming calls here, as it will not affect UI thread performance
     public String run() {
-        //имитируем длительное сохранение пользователей
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-        }
+        UiHelper.writeLog("ChronosSaveUsersToDb called");
         mContext=DevintensiveApplication.getContext();
         mDataManager = DataManager.getInstance();
-        mUserDao = mDataManager.getDaoSession().getUserDao();
-        mRepositoryDao = mDataManager.getDaoSession().getRepositoryDao();
+        mDaoSession = mDataManager.getDaoSession();
+        mUserDao = mDaoSession.getUserDao();
+        mRepositoryDao =mDaoSession.getRepositoryDao();
+        mLikesByDao = mDaoSession.getLikesByDao();
+
         if (NetworkStatusChecker.isNetworkAvailable(mContext)) {
             Call<UserListRes> call = mDataManager.getUserListFromNetork();
             try {
@@ -53,13 +57,67 @@ public class ChronosSaveUsersToDb extends ChronosOperation<String> {
                 if (response.code()==200) {
                     List<Repository> allRepositories = new ArrayList<Repository>();
                     List<User> allUsers = new ArrayList<User>();
+                    List<String> newUsers = new ArrayList<>();
+                    List<LikesBy> allLikes = new ArrayList<LikesBy>();
+                    long index = 0;
+
                     for (UserListRes.Datum  userRes : response.body().getData()) {
+                        index += 1;
+                        long number = index;
+                        //// TODO: проверить необходимость в этом
+                        User user = mDaoSession.queryBuilder(User.class)
+                                .where(UserDao.Properties.RemoteId.eq(userRes.getId())).build().unique();
+                        if (user != null) number = user.getIndex();
+
+                        //добавляем в список новых юзеров для фильтрации
+                        newUsers.add(userRes.getId());
+                        //сохраняем список лайков каждого пользователя в общий список
+                        allLikes.addAll(getLikesListFromUserRes(userRes));
                         //сохраняем список репозиториев каждого пользователя в общий список
                         allRepositories.addAll(getRepoListFromUserRes(userRes));
                         //сохраняем каждого пользователя в общий список
-                        allUsers.add(new User(userRes));
+                        allUsers.add(new User(userRes, number));
                     }
+
+                    //получаем список старых/удаленных с сервера пользователей из локальной базы
+                    List oldUsers =  mDaoSession.queryBuilder(User.class)
+                            .where(UserDao.Properties.RemoteId.notIn(newUsers))
+                            .list();
+                    //очищаем этих пользователей, так как каскадного удаления нет, то делаем отдельными запросами
+                    if (oldUsers!=null && oldUsers.size()>0) {
+                        //удаляем старых пользователей
+                        UiHelper.writeLog("ChronosSaveUsersToDb: удалили "+oldUsers.size()+" старых пользователей из локальной базы");
+                        mUserDao.deleteInTx(oldUsers);
+
+                        //удаляем репозитории удаленных/старых пользователей
+                        List oldRepo =  mDaoSession.queryBuilder(Repository.class)
+                                .where(RepositoryDao.Properties.UserRemoteId.notIn(newUsers))
+                                .list();
+                        if (oldRepo!=null && oldRepo.size()>0) {
+                            UiHelper.writeLog("ChronosSaveUsersToDb: удалили "+oldRepo.size()+" старых репозиториев из локальной базы");
+                            mRepositoryDao.deleteInTx(oldRepo);
+                        }
+
+                        //удаляем лайки удаленных/старых пользователей
+                        List oldLikes =  mDaoSession.queryBuilder(LikesBy.class)
+                                .where(LikesByDao.Properties.UserRemoteId.notIn(newUsers))
+                                .list();
+                        if (oldLikes!=null && oldLikes.size()>0) {
+                            UiHelper.writeLog("ChronosSaveUsersToDb: удалили "+oldLikes.size()+" старых лайков из локальной базы");
+                            mLikesByDao.deleteInTx(oldLikes);
+                        }
+                    } else {
+                        UiHelper.writeLog("ChronosSaveUsersToDb: удаленных пользователей в локальной базе не обнаружено");
+                    }
+
+                    //так как лайков может быть много, очищаем старые лайки
+                    mDaoSession.queryBuilder(LikesBy.class).where(LikesByDao.Properties.UserRemoteId.in(newUsers)).buildDelete().executeDeleteWithoutDetachingEntities();
+                    mLikesByDao.insertOrReplaceInTx(allLikes);
+
+                    //так как репозиториев может быть много, очищаем старые лайки
+                    mDaoSession.queryBuilder(Repository.class).where(RepositoryDao.Properties.UserRemoteId.in(newUsers)).buildDelete().executeDeleteWithoutDetachingEntities();
                     mRepositoryDao.insertOrReplaceInTx(allRepositories);
+
                     mUserDao.insertOrReplaceInTx(allUsers);
                     result=mContext.getString(R.string.success_user_list_load);
                 } else if (response.code()==404) {
@@ -81,10 +139,20 @@ public class ChronosSaveUsersToDb extends ChronosOperation<String> {
     private List<Repository> getRepoListFromUserRes(UserListRes.Datum userData){
         final String userId = userData.getId();
         List<Repository> repositories = new ArrayList<>();
-        for (UserListRes.Datum.Repo repositoryRes : userData.getRepositories().getRepo()) {
+        for (UserListRes.Repo repositoryRes : userData.getRepositories().getRepo()) {
             repositories.add(new Repository(repositoryRes, userId));
         }
         return repositories;
+    }
+
+    private List<LikesBy> getLikesListFromUserRes(UserListRes.Datum userData){
+        final String userId = userData.getId();
+        List<LikesBy> userLiked = new ArrayList<LikesBy>();
+        for (int i=0; i<userData.getProfileValues().getLikesBy().size();i++) {
+            LikesBy userLike = new LikesBy(userData.getProfileValues().getLikesBy().get(i), userId);
+            userLiked.add(userLike);
+        }
+        return userLiked;
     }
 
     @NonNull

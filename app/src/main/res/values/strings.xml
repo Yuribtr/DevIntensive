@@ -27,6 +27,9 @@
     <string name="email_subject">Message from app: </string>
     <string name="email_body">Тестовое сообщение</string>
     <string name="no_email_programms_installed">Почтовые программы не установлены</string>
+    <string name="user_info_saved_message">данные пользователя сохранены</string>
+    <string name="user_info_loaded_message">данные пользователя загружены</string>
+    <string name="error_user_info_save_message">ошибочные данные пользователя не сохранены</string>
     <string name="error_url_message">Неправильный адрес сайта</string>
     <string name="error_email_message">Неправильный адрес email</string>
     <string name="error_phone_message">Неправильный номер телефона</string>
@@ -63,5 +66,21 @@
     <string name="button_undo">Отменить</string>
     <string name="camera_permission_granted">использование камеры разрешено</string>
     <string name="gallery_permission_granted">использование галлереи изображений разрешено</string>
+    <string name="user_deleted_from_list">Пользователь %1$s\n удален из списка. Для окончательного удаления еще раз проведите пальцем.</string>
+    <string name="revert"><u>Восстановить</u></string>
+    <string name="error_load_photo_from_network">невозможно загрузить фото с сети :</string>
+    <string name="success_photo_loaded_from_network">фото загружено из сети :</string>
+    <string name="error_load_photo_from_cache">невозможно загрузить фото из кеша :</string>
+    <string name="success_photo_loaded_from_cache">фото взято с кеша :</string>
+    <string name="no_photo_assigned">"фотография не установлена :"</string>
+    <string name="gallery_image_mode_choosen">выбрана загрузка из галлереи</string>
+    <string name="camera_image_mode_choosen">выбрана загрузка с камеры</string>
+    <string name="btn_yes">Да</string>
+    <string name="btn_no">Нет</string>
+    <string name="btn_cancel">Отменить</string>
+    <string name="btn_cancel_remove">Отменить удаление</string>
+    <string name="success_like_message">успешно поставили лайк</string>
+    <string name="success_unlike_message">успешно сняли лайк</string>
+    <string name="fio_placeholder">Фамилия Имя</string>
 
 </resources>

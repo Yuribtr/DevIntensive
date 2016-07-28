@@ -2,13 +2,13 @@ package com.softdesign.devintensive.data.managers;
 
 import android.content.Context;
 
-import com.softdesign.devintensive.data.network.FileUploadService;
 import com.softdesign.devintensive.data.network.PicassoCache;
 import com.softdesign.devintensive.data.network.RestService;
 import com.softdesign.devintensive.data.network.ServiceGenerator;
 import com.softdesign.devintensive.data.network.req.UserLoginReq;
 import com.softdesign.devintensive.data.network.res.GetUserRes;
 import com.softdesign.devintensive.data.network.res.UploadPhotoRes;
+import com.softdesign.devintensive.data.network.res.UserLikeRes;
 import com.softdesign.devintensive.data.network.res.UserListRes;
 import com.softdesign.devintensive.data.network.res.UserModelRes;
 import com.softdesign.devintensive.data.storage.models.DaoSession;
@@ -17,7 +17,6 @@ import com.squareup.picasso.Picasso;
 
 import okhttp3.MultipartBody;
 import retrofit2.Call;
-import retrofit2.http.Part;
 
 public class DataManager {
     private static DataManager INSTANCE = null;
@@ -28,8 +27,6 @@ public class DataManager {
     private RestService mRestService;
 
     private DaoSession mDaoSession;
-
-    private FileUploadService mFileUploadService;
 
     public DataManager(){
         this.mPreferencesManager = new PreferencesManager();
@@ -54,7 +51,6 @@ public class DataManager {
 
     public Picasso getPicasso() {return mPicasso;}
 
-    //01:09 #5
     //region ============ NETWORK ============
     public Call<UserModelRes> loginUser(UserLoginReq userLoginReq){return mRestService.loginUser(userLoginReq);}
 
@@ -66,15 +62,15 @@ public class DataManager {
         return mRestService.getUserlist();
     }
 
-    //public Call<UploadPhotoRes> uploadPhoto(String userId, MultipartBody.Part file){return mFileUploadService.uploadPhoto(userId, file);}
-    //endregion
+    public Call<UserLikeRes> setUserLike(String userId) {
+        return mRestService.setUserLike(userId);
+    }
 
-    //00:46 #7
+    public Call<UserLikeRes> setUserUnLike(String userId) { return mRestService.setUserUnLike(userId);}
+
     //region ============ DATABASE ============
 
-
     public DaoSession getDaoSession() {return mDaoSession;}
-
 
     //endregion
 }

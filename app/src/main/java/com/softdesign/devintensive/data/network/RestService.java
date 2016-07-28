@@ -3,6 +3,7 @@ package com.softdesign.devintensive.data.network;
 import com.softdesign.devintensive.data.network.req.UserLoginReq;
 import com.softdesign.devintensive.data.network.res.GetUserRes;
 import com.softdesign.devintensive.data.network.res.UploadPhotoRes;
+import com.softdesign.devintensive.data.network.res.UserLikeRes;
 import com.softdesign.devintensive.data.network.res.UserListRes;
 import com.softdesign.devintensive.data.network.res.UserModelRes;
 import okhttp3.MultipartBody;
@@ -34,4 +35,9 @@ public interface RestService {
     Call<UploadPhotoRes> uploadPhoto(@Path("userId") String userId,
                                      @Part MultipartBody.Part file);
 
+    @POST("user/{userId}/like")
+    Call<UserLikeRes> setUserLike (@Path("userId") String userId);
+
+    @POST("user/{userId}/unlike")
+    Call<UserLikeRes> setUserUnLike (@Path("userId") String userId);
 }

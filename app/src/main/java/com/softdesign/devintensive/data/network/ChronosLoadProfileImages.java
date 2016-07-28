@@ -12,6 +12,7 @@ import com.softdesign.devintensive.ui.activities.ProfileUserActivity;
 import com.softdesign.devintensive.ui.activities.UserListActivity;
 import com.softdesign.devintensive.ui.adapters.UsersAdapter;
 import com.softdesign.devintensive.utils.ConstantManager;
+import com.softdesign.devintensive.utils.CustomClickListener;
 import com.softdesign.devintensive.utils.DevintensiveApplication;
 import org.greenrobot.greendao.query.WhereCondition;
 import org.jetbrains.annotations.Nullable;
@@ -34,7 +35,7 @@ public class ChronosLoadProfileImages extends ChronosOperation<UsersAdapter> {
     //any time-consuming calls here, as it will not affect UI thread performance
     public UsersAdapter run() {
         try {
-            mUsersAdapter = new UsersAdapter(mUsers, new UsersAdapter.UserViewHolder.CustomClickListener() {
+            mUsersAdapter = new UsersAdapter(mUsers, new CustomClickListener() {
                 @Override
                 public void onUserItemClickListener(int position) {
                     //передаем данные профиля конкретного пользователя в новую активити через Data Transfer Objects

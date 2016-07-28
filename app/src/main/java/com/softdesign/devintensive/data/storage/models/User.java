@@ -1,20 +1,24 @@
 package com.softdesign.devintensive.data.storage.models;
 
-
+import com.softdesign.devintensive.data.managers.DataManager;
+import com.softdesign.devintensive.data.managers.PreferencesManager;
 import com.softdesign.devintensive.data.network.res.UserListRes;
+import com.softdesign.devintensive.utils.UiHelper;
 
+import org.greenrobot.greendao.DaoException;
 import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.JoinProperty;
+import org.greenrobot.greendao.annotation.Keep;
 import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.annotation.ToMany;
 import org.greenrobot.greendao.annotation.Unique;
 
+import java.util.ArrayList;
 import java.util.List;
-import org.greenrobot.greendao.annotation.Generated;
-import org.greenrobot.greendao.DaoException;
 
-@Entity (active=true, nameInDb = "USERS")
+@Entity(active = true, nameInDb = "USERS")
 public class User {
 
     @Id
@@ -36,27 +40,48 @@ public class User {
 
     private int rating;
 
+    private int likesCount;
+
     private int codeLines;
 
     private int projects;
 
+    private boolean isMyLike;
+
     private String bio;
+
+    private Long index;
 
     @ToMany(joinProperties = {
             @JoinProperty(name = "remoteId", referencedName = "userRemoteId")
     })
-
     private List<Repository> repositories;
 
-    public User(UserListRes.Datum userRes) {
-        this.remoteId = userRes.getId();
-        this.photo = userRes.getPublicInfo().getPhoto();
-        this.fullName = userRes.getFullName();
-        this.searchName = userRes.getFullName().toUpperCase();
-        this.rating = userRes.getProfileValues().getRating();
-        this.codeLines = userRes.getProfileValues().getLinesCode();
-        this.projects = userRes.getProfileValues().getProjects();
-        this.bio = userRes.getPublicInfo().getBio();
+    @ToMany(joinProperties = {
+            @JoinProperty(name = "remoteId", referencedName = "userRemoteId")
+    })
+    private List<LikesBy> userLiked;
+
+/** Used for active entity operations. */
+    @Generated(hash = 1507654846)
+    private transient UserDao myDao;
+
+    /** Used to resolve relations */
+    @Generated(hash = 2040040024)
+    private transient DaoSession daoSession;
+
+
+
+    public User(UserListRes.Datum userRes, Long number) {
+        remoteId = userRes.getId();
+        photo = userRes.getPublicInfo().getPhoto();
+        fullName = userRes.getFullName();
+        searchName = userRes.getFullName().toUpperCase();
+        rating = userRes.getProfileValues().getRating();
+        codeLines = userRes.getProfileValues().getLinesCode();
+        projects = userRes.getProfileValues().getProjects();
+        bio = userRes.getPublicInfo().getBio();
+        index = number;
     }
 
     /**
@@ -96,6 +121,19 @@ public class User {
     }
 
     /** Resets a to-many relationship, making the next get call to query for a fresh result. */
+    @Generated(hash = 1814136929)
+    public synchronized void resetUserLiked() {
+        userLiked = null;
+    }
+
+    /**
+     * To-many relationship, resolved on first access (and after reset).
+     * Changes to to-many relations are not persisted, make changes to the target entity.
+     */
+
+
+
+    /** Resets a to-many relationship, making the next get call to query for a fresh result. */
     @Generated(hash = 438307964)
     public synchronized void resetRepositories() {
         repositories = null;
@@ -130,13 +168,13 @@ public class User {
         myDao = daoSession != null ? daoSession.getUserDao() : null;
     }
 
-    /** Used for active entity operations. */
-    @Generated(hash = 1507654846)
-    private transient UserDao myDao;
+    public Long getIndex() {
+        return this.index;
+    }
 
-    /** Used to resolve relations */
-    @Generated(hash = 2040040024)
-    private transient DaoSession daoSession;
+    public void setIndex(Long index) {
+        this.index = index;
+    }
 
     public String getBio() {
         return this.bio;
@@ -144,6 +182,14 @@ public class User {
 
     public void setBio(String bio) {
         this.bio = bio;
+    }
+
+    public boolean getIsMyLike() {
+        return this.isMyLike;
+    }
+
+    public void setIsMyLike(boolean isMyLike) {
+        this.isMyLike = isMyLike;
     }
 
     public int getProjects() {
@@ -160,6 +206,14 @@ public class User {
 
     public void setCodeLines(int codeLines) {
         this.codeLines = codeLines;
+    }
+
+    public int getLikesCount() {
+        return this.likesCount;
+    }
+
+    public void setLikesCount(int likesCount) {
+        this.likesCount = likesCount;
     }
 
     public int getRating() {
@@ -210,22 +264,50 @@ public class User {
         this.id = id;
     }
 
-    @Generated(hash = 1023608416)
-    public User(Long id, @NotNull String remoteId, String photo,
-            @NotNull String fullName, @NotNull String searchName, int rating,
-            int codeLines, int projects, String bio) {
+    /**
+     * To-many relationship, resolved on first access (and after reset).
+     * Changes to to-many relations are not persisted, make changes to the target entity.
+     */
+    @Generated(hash = 1730860725)
+    public List<LikesBy> getUserLiked() {
+        if (userLiked == null) {
+            final DaoSession daoSession = this.daoSession;
+            if (daoSession == null) {
+                throw new DaoException("Entity is detached from DAO context");
+            }
+            LikesByDao targetDao = daoSession.getLikesByDao();
+            List<LikesBy> userLikedNew = targetDao._queryUser_UserLiked(remoteId);
+            synchronized (this) {
+                if(userLiked == null) {
+                    userLiked = userLikedNew;
+                }
+            }
+        }
+        return userLiked;
+    }
+
+    @Generated(hash = 1391876202)
+    public User(Long id, @NotNull String remoteId, String photo, @NotNull String fullName,
+            @NotNull String searchName, int rating, int likesCount, int codeLines, int projects,
+            boolean isMyLike, String bio, Long index) {
         this.id = id;
         this.remoteId = remoteId;
         this.photo = photo;
         this.fullName = fullName;
         this.searchName = searchName;
         this.rating = rating;
+        this.likesCount = likesCount;
         this.codeLines = codeLines;
         this.projects = projects;
+        this.isMyLike = isMyLike;
         this.bio = bio;
+        this.index = index;
     }
 
     @Generated(hash = 586692638)
     public User() {
     }
+
+
+
 }

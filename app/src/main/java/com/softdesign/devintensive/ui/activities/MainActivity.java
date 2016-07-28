@@ -47,6 +47,7 @@ import com.softdesign.devintensive.data.network.ChronosPhotoUpload;
 import com.softdesign.devintensive.utils.ConstantManager;
 import com.softdesign.devintensive.utils.DevintensiveApplication;
 import com.softdesign.devintensive.utils.TransformRoundedImage;
+import com.softdesign.devintensive.utils.UiHelper;
 import com.softdesign.devintensive.utils.UserFieldsWatcher;
 import com.squareup.picasso.Picasso;
 import android.widget.RelativeLayout;
@@ -251,7 +252,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private void setupDrawer() {
         NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
         navigationView.setCheckedItem(R.id.user_profile_menu);
-        //добавляем слушателей дял нажатия кнопок в боковом меню
+        //добавляем слушателей для нажатия кнопок в боковом меню
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
                                                              @Override
                                                              public boolean onNavigationItemSelected(MenuItem item) {
@@ -263,6 +264,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                                                                  if (item.getItemId()==R.id.clear_credentials) {
                                                                      //очищаем сохраненный токен
                                                                      mDataManager.getPreferencesManager().clearAuthToken();
+                                                                     UiHelper.writeLog(mContext.getString(R.string.token_deleted_message));
                                                                      showToast(getString(R.string.token_deleted_message));
                                                                  }
                                                                  item.setChecked(true);
@@ -281,6 +283,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             //в диалоге выбрано получение изображения с галлереи
             case ConstantManager.REQUEST_GALLERY_PICTURE:
                 if (resultCode == RESULT_OK && data != null){
+                    UiHelper.writeLog(mContext.getString(R.string.gallery_image_mode_choosen));
                     showProgress();
                     mSelectedImage = data.getData();
                     insertProfileImage(mSelectedImage, ConstantManager.FROM_GALLERY);
@@ -289,6 +292,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             //в диалоге выбрано получение изображения с камеры
             case ConstantManager.REQUEST_CAMERA_PICTURE:
                 if (resultCode == RESULT_OK && mPhotoFile != null){
+                    UiHelper.writeLog(mContext.getString(R.string.camera_image_mode_choosen));
                     showProgress();
                     mSelectedImage = Uri.fromFile(mPhotoFile);
                     insertProfileImage(mSelectedImage, ConstantManager.FROM_CAMERA);
@@ -314,7 +318,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         }
         else {
             //если в полях ошибки - не даем выйти из режима редактирования
-            if (!checkUserValues()) return 1;
+            if (!checkUserValues()) {
+                UiHelper.writeLog(mContext.getString(R.string.error_user_info_save_message));
+                return 1;
+            }
             //выключаем режим редактирования
             mFab.setImageResource(R.drawable.ic_create_black_24dp);
             //разрешаем ввод в поля ввода
@@ -329,6 +336,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             mCollapsingToolbar.setExpandedTitleColor(getResources().getColor(R.color.white));
             //сохраняем поля и счетчики
             saveUserFields();
+            UiHelper.writeLog(mContext.getString(R.string.user_info_saved_message));
             return mode;
         }
     }
@@ -348,6 +356,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 case R.id.phone_at:
                     if (!checkWithRegExp(userValue.getText().toString(), ConstantManager.PATTERN_PHONE)){
                         showToast(getString(R.string.error_phone_message));
+                        UiHelper.writeLog(mContext.getString(R.string.error_phone_message));
                         setFocusEditText(R.id.phone_at);
                         return false;
                     }
@@ -355,6 +364,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 case R.id.email_et:
                     if (!checkWithRegExp(userValue.getText().toString(), ConstantManager.PATTERN_EMAIL)){
                         showToast(getString(R.string.error_email_message));
+                        UiHelper.writeLog(mContext.getString(R.string.error_email_message));
                         setFocusEditText(R.id.email_et);
                         return false;
                     }
@@ -362,6 +372,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 case R.id.vk_et:
                     if (!checkWithRegExp(userValue.getText().toString(), ConstantManager.PATTERN_VK_URL)){
                         showToast(getString(R.string.error_url_message));
+                        UiHelper.writeLog(mContext.getString(R.string.error_url_message));
                         setFocusEditText(R.id.vk_et);
                         return false;
                     }
@@ -369,6 +380,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 case R.id.repository_et:
                     if (!checkWithRegExp(userValue.getText().toString(), ConstantManager.PATTERN_GIT_URL)){
                         showToast(getString(R.string.error_url_message));
+                        UiHelper.writeLog(mContext.getString(R.string.error_url_message));
                         setFocusEditText(R.id.repository_et);
                         return false;
                     }
@@ -398,20 +410,21 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         setTitle(mDataManager.getPreferencesManager().loadUserFio());
         //загружаем фото пользователя с ресайзом
         Picasso.with(this).load(mDataManager.getPreferencesManager().loadUserPhoto())
-                .placeholder(R.drawable.userphoto)
-                .error(R.drawable.userphoto)
+                .placeholder(R.drawable.user_bg)
+                .error(R.drawable.user_bg)
                 .resize(768,512)
                 .centerCrop()
                 .into(mProfileImage);
         //загружаем аватарку пользователя с ресайзом
         Picasso.with(this)
                 .load(mDataManager.getPreferencesManager().loadUserAvatar())
-                .placeholder(R.drawable.avatar)
-                .error(R.drawable.avatar)
+                .placeholder(R.drawable.user_bg)
+                .error(R.drawable.user_bg)
                 .fit()
                 .centerCrop()
                 .transform(new TransformRoundedImage())
                 .into(avatar_iv);
+        UiHelper.writeLog(mContext.getString(R.string.user_info_loaded_message));
     }
 
     private void saveUserFields() {
@@ -444,6 +457,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     permission.WRITE_EXTERNAL_STORAGE
             }, ConstantManager.CAMERA_REQUEST_PERMISSION_CODE);
             //на всякий случай напоминаем пользователю что без разрешений рыбку не съесть
+            UiHelper.writeLog(mContext.getString(R.string.message_permission_needed));
             Snackbar.make(mCoordinatorLayout, R.string.message_permission_needed, Snackbar.LENGTH_LONG)
                     .setAction(R.string.message_allow, new View.OnClickListener() {
                         @Override
@@ -476,6 +490,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     permission.WRITE_EXTERNAL_STORAGE
             }, ConstantManager.CAMERA_REQUEST_PERMISSION_CODE);
             //на всякий случай напоминаем пользователю что без разрешений рыбку не съесть
+            UiHelper.writeLog(mContext.getString(R.string.message_permission_needed));
             Snackbar.make(mCoordinatorLayout, R.string.message_permission_needed, Snackbar.LENGTH_LONG)
                     .setAction(R.string.message_allow, new View.OnClickListener() {
                         @Override
@@ -492,10 +507,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         if (requestCode==ConstantManager.CAMERA_REQUEST_PERMISSION_CODE && grantResults.length==2){
             if (grantResults[0]==PackageManager.PERMISSION_GRANTED){
                 showToast(getString(R.string.camera_permission_granted));
+                UiHelper.writeLog(mContext.getString(R.string.camera_permission_granted));
             }
         }
         if (grantResults[1]==PackageManager.PERMISSION_GRANTED) {
             showToast(getString(R.string.gallery_permission_granted));
+            UiHelper.writeLog(mContext.getString(R.string.gallery_permission_granted));
         }
     }
 
@@ -585,15 +602,18 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     public void onOperationFinished(final ChronosPhotoUpload.Result result) {
         if (result.isSuccessful()) {
             if (result.getOutput().equals(mContext.getString(R.string.success_photo_update_message))){
+                UiHelper.writeLog(mContext.getString(R.string.success_photo_update_message));
                 //выключаем режим редактирования чтобы показать что фото обновилось
                 mCurrentEditMode=mCurrentEditMode==0?changeEditMode(1):changeEditMode(0);
                 showSnackbar(result.getOutput());
             } else {
                 //если ошибочный пароль или токен или другая ошибка
+                UiHelper.writeLog(result.getOutput());
                 showSnackbar(result.getOutput());
             }
         } else {
             //ошибки кроноса выведутся здесь
+            UiHelper.writeLog(mContext.getString(R.string.error_internal_message));
             showToast(getString(R.string.error_internal_message)+" at ChronosPhotoUpload");
         }
         hideProgress();
@@ -616,6 +636,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             Intent chooser = Intent.createChooser(intent, title);
             startActivity(chooser);
         } else {
+            UiHelper.writeLog(mContext.getString(R.string.error_url_message));
             showToast(getString(R.string.error_url_message));
         }
     }
@@ -637,6 +658,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 showToast(getString(R.string.no_email_programms_installed));
             }
         } else {
+            UiHelper.writeLog(mContext.getString(R.string.error_email_message));
             showToast(getString(R.string.error_email_message));
         }
     }
@@ -647,6 +669,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 Intent callIntent = new Intent(Intent.ACTION_DIAL, uri);
                 startActivity(callIntent);
             } else {
+                UiHelper.writeLog(mContext.getString(R.string.error_phone_message));
                 showToast(getString(R.string.error_phone_message));
             }
         } else {
@@ -654,6 +677,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             ActivityCompat.requestPermissions(this, new String[]{
                     permission.CALL_PHONE,
             }, ConstantManager.PHONE_CALL_REQUEST_PERMISSION_CODE);
+            UiHelper.writeLog(mContext.getString(R.string.message_permission_needed));
             //на всякий случай напоминаем пользователю что без разрешений рыбку не съесть
             Snackbar.make(mCoordinatorLayout, R.string.message_permission_needed, Snackbar.LENGTH_LONG)
                     .setAction(R.string.message_allow, new View.OnClickListener() {

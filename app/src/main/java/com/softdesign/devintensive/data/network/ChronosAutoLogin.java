@@ -29,11 +29,6 @@ public class ChronosAutoLogin extends ChronosOperation<String> {
     //Chronos will run this method in a background thread, which means you can put
     //any time-consuming calls here, as it will not affect UI thread performance
     public String run() {
-        //имитируем медленную сеть
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-        }
         mContext= DevintensiveApplication.getContext();
         mDataManager = DataManager.getInstance();
         if (NetworkStatusChecker.isNetworkAvailable(mContext)) {
