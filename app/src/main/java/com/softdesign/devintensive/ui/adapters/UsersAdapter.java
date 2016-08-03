@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Filter;
 import android.widget.Filterable;
@@ -245,8 +246,6 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
             UiHelper.writeLog("UserViewHolder constructor");
             this.mListener = customClickListener;
             mCardView = (CardView) itemView.findViewById(R.id.cardView);
-            mCardView.setMaxCardElevation(100);
-            mCardView.setCardElevation(0);
             mUserPhoto = (AspectRatioImageView) itemView.findViewById(R.id.user_photo);
             mFullName = (TextView) itemView.findViewById(R.id.user_full_name_txt);
             mRating = (TextView) itemView.findViewById(R.id.rating_txt);

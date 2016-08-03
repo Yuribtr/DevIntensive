@@ -10,6 +10,7 @@ import java.util.List;
 public class UserModelManager {
 
     public static void saveUserModelToPreferenses(DataManager dataManager, UserModelRes userModel) {
+        //// TODO: исправить ретинг при обычном логине (неавтоматическом)
         dataManager.getPreferencesManager().setAuthToken(userModel.getData().getToken());
         dataManager.getPreferencesManager().saveUserId(userModel.getData().getUser().getId());
         int[] userRatings = {
@@ -39,7 +40,7 @@ public class UserModelManager {
 
     public static void saveUserModelToPreferenses(DataManager dataManager, GetUserRes userModel) {
         int[] userRatings = {
-                userModel.getData().getProfileValues().getRait(),
+                userModel.getData().getProfileValues().getRating(),
                 userModel.getData().getProfileValues().getLinesCode(),
                 userModel.getData().getProfileValues().getProjects()
         };

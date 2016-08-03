@@ -56,7 +56,7 @@ public class ChronosLogin extends ChronosOperation<String> {
                 }
             }
         } else {
-            result=mContext.getString(R.string.error_network_is_not_available);
+            result = mContext.getString(R.string.error_network_is_not_available);
         }
         return result;
     }

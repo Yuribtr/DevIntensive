@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Батраков Юрий</string>
+    <string name="app_name">DevIntensive App</string>
     <string name="counter_tv">5</string>
     <string name="rating_tv">Рейтинг</string>
     <string name="code_lines_counts_tv">Написано строк кода</string>
@@ -44,7 +44,7 @@
     <string name="success_token_message">сохраненные логин и токен действительны</string>
     <string name="my_profile_mi">Мой профиль</string>
     <string name="my_team_im">Команда</string>
-    <string name="clear_credentials">Очистить данные входа</string>
+    <string name="clear_credentials">Выйти из профиля</string>
     <string name="profile_view_btn">Просмотр профиля</string>
     <string name="error_not_found">ресурс не найден</string>
     <string name="error_null_pointer">ошибка указателя</string>
@@ -60,7 +60,7 @@
     <string name="connecting_to_server_message">соединяемся с сервером...</string>
     <string name="error_credintials_empty_message">логин или пароль не могут быть пустыми</string>
     <string name="success_login_message">логин и пароль подошли</string>
-    <string name="for_developers_only">Для разработчиков</string>
+    <string name="for_developers_only"></string>
     <string name="token_deleted_message">токен удален</string>
     <string name="user_profile_image_file_error">путь к изображению не существует</string>
     <string name="button_undo">Отменить</string>
@@ -82,5 +82,8 @@
     <string name="success_like_message">успешно поставили лайк</string>
     <string name="success_unlike_message">успешно сняли лайк</string>
     <string name="fio_placeholder">Фамилия Имя</string>
+    <string name="zero">0</string>
+    <string name="likes_count_tv">счетчик лайков</string>
+    <string name="my_like_img">мой лайк</string>
 
 </resources>

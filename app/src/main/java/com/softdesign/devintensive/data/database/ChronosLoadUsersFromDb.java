@@ -46,7 +46,7 @@ public class ChronosLoadUsersFromDb extends ChronosOperation<List<User>> {
         try {
             userList = mDaoSession.queryBuilder(User.class)
                     .where(likeWhere)
-                    .orderDesc(UserDao.Properties.CodeLines)
+                    .orderDesc(UserDao.Properties.Rating)
                     .build()
                     .list();
 

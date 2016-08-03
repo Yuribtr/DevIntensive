@@ -56,7 +56,7 @@ import android.widget.TextView;
 public class MainActivity extends BaseActivity implements View.OnClickListener {
     private static final String TAG = ConstantManager.TAG_PREFIX + "Main Activity";
     private DataManager mDataManager;
-    private int mCurrentEditMode = 0;
+    private int mCurrentEditMode = ConstantManager.EDIT_OFF;
     private ImageView mCallBtn, mEmailBtn, mVkBtn, mGitBtn;
     private CoordinatorLayout mCoordinatorLayout;
     private Toolbar mToolbar;
@@ -152,7 +152,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         } else {
             //активити уже создавалось
             mCurrentEditMode= savedInstanceState.getInt(ConstantManager.EDIT_MODE_KEY,0);
-            changeEditMode(mCurrentEditMode);
+            mCurrentEditMode=changeEditMode(mCurrentEditMode);
         }
     }
 
@@ -193,7 +193,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         switch (v.getId()) {
             case R.id.fab:
                 //если клик на главной кнопке - то переключаем режим редактирования с проверкой данных и их сохранением
-                mCurrentEditMode=mCurrentEditMode==0?changeEditMode(1):changeEditMode(0);
+                mCurrentEditMode=mCurrentEditMode==ConstantManager.EDIT_OFF?changeEditMode(ConstantManager.EDIT_ON):changeEditMode(ConstantManager.EDIT_OFF);
                 break;
             case R.id.profile_placeholder:
                 //показываем меню выбора способа загрузки фото профиля
@@ -222,11 +222,17 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         //слушаем нажатие кнопки Назад
         if ((keyCode == KeyEvent.KEYCODE_BACK) && (event.getRepeatCount() == 0)) {
-            //если боковое меню развернуто, сворачиваем её
+            //если боковое меню развернуто, сворачиваем его
             if(drawer_l.isDrawerOpen(GravityCompat.START)) {
                 drawer_l.closeDrawer(GravityCompat.START);
-                return true;
+                return false;
             }
+            //запрещаем возврат по кнопке Назад, если мы в режиме редактирования и пытаемся выйти из редактирования
+            if (mCurrentEditMode==ConstantManager.EDIT_ON) {
+                mCurrentEditMode = changeEditMode(ConstantManager.EDIT_OFF);
+                return false;
+            }
+            return true;
         }
         return super.onKeyDown(keyCode, event);
     }
@@ -265,7 +271,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                                                                      //очищаем сохраненный токен
                                                                      mDataManager.getPreferencesManager().clearAuthToken();
                                                                      UiHelper.writeLog(mContext.getString(R.string.token_deleted_message));
-                                                                     showToast(getString(R.string.token_deleted_message));
+                                                                     //переходим в окно авторизации
+                                                                     Intent authIntent = new Intent(MainActivity.this, AuthActivity.class);
+                                                                     startActivity(authIntent);
+//                                                                     showToast(getString(R.string.token_deleted_message));
                                                                  }
                                                                  item.setChecked(true);
                                                                  //сворачиваем панель
@@ -302,7 +311,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     private int changeEditMode(int mode)  {
-        if (mode == 1) {
+        if (mode == ConstantManager.EDIT_ON) {
             //включаем режим редактирования
             mFab.setImageResource(R.drawable.ic_done_black_24dp);
             for (EditText userValue : mUserInfoViews) {
@@ -418,8 +427,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         //загружаем аватарку пользователя с ресайзом
         Picasso.with(this)
                 .load(mDataManager.getPreferencesManager().loadUserAvatar())
-                .placeholder(R.drawable.user_bg)
-                .error(R.drawable.user_bg)
+                .placeholder(R.drawable.avatar)
+                .error(R.drawable.avatar)
                 .fit()
                 .centerCrop()
                 .transform(new TransformRoundedImage())
@@ -604,7 +613,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             if (result.getOutput().equals(mContext.getString(R.string.success_photo_update_message))){
                 UiHelper.writeLog(mContext.getString(R.string.success_photo_update_message));
                 //выключаем режим редактирования чтобы показать что фото обновилось
-                mCurrentEditMode=mCurrentEditMode==0?changeEditMode(1):changeEditMode(0);
+                mCurrentEditMode=mCurrentEditMode==ConstantManager.EDIT_OFF?changeEditMode(ConstantManager.EDIT_ON):changeEditMode(ConstantManager.EDIT_OFF);
                 showSnackbar(result.getOutput());
             } else {
                 //если ошибочный пароль или токен или другая ошибка

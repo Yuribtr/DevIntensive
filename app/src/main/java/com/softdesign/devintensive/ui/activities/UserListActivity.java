@@ -22,6 +22,8 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import com.softdesign.devintensive.data.network.ChronosLoadProfileImages;
+
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -77,9 +79,6 @@ public class UserListActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         mConnector = new ChronosConnector();
         mConnector.onCreate(this, savedInstanceState);
-        //DaoSession.clear();
-        //mDataManager.getDaoSession().getLikesByDao().detachAll();
-
         setContentView(R.layout.activity_user_list);
 
         mDataManager = DataManager.getInstance();
@@ -105,6 +104,10 @@ public class UserListActivity extends BaseActivity {
         if (avatar_iv != null)
             Picasso.with(this)
                     .load(mDataManager.getPreferencesManager().loadUserAvatar())
+                    .placeholder(R.drawable.avatar)
+                    .error(R.drawable.avatar)
+                    .fit()
+                    .centerCrop()
                     .transform(new TransformRoundedImage())
                     .into(avatar_iv);
         //подгружаем ФИО и почту в боковое меню
@@ -116,7 +119,18 @@ public class UserListActivity extends BaseActivity {
         loadUsersFromDb();
     }
 
-
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        //слушаем нажатие кнопки Назад
+        if ((keyCode == KeyEvent.KEYCODE_BACK) && (event.getRepeatCount() == 0)) {
+            //если боковое меню развернуто, сворачиваем её
+            if(drawer_l.isDrawerOpen(GravityCompat.START)) {
+                drawer_l.closeDrawer(GravityCompat.START);
+                return true;
+            }
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 
     @Override
     protected void onResume() {

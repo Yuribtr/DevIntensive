@@ -28,7 +28,7 @@ public interface ConstantManager {
     String USER_FIO_KEY = "USER_FIO_KEY";
 
     String PATTERN_PHONE = "^[+]{1}[-0-9]{1}\\s\\([-0-9]{3}\\)\\s[-0-9]{3}-[-0-9]{2}-[-0-9]{2}";
-    String PATTERN_EMAIL = "^[a-zA-Z_0-9]{3,}@[a-zA-Z_0-9.]{2,}\\.[a-zA-Z0-9]{2,}$";
+    String PATTERN_EMAIL = "^[a-zA-Z_0-9.]{3,}@[a-zA-Z_0-9.]{2,}\\.[a-zA-Z0-9]{2,}$";
     String PATTERN_VK_URL = "^vk\\.com\\/[a-zA-Z_0-9.]+$";
     String PATTERN_GIT_URL = "^github\\.com\\/[a-zA-Z_0-9.\\/]+$";
 
@@ -43,6 +43,9 @@ public interface ConstantManager {
     String PARCELABLE_KEY = "PARCELABLE_KEY";
     int SEARCH_DELAY = 2000;
     int CACHE_EXPIRE_DEFAULT = 86400;
+
+    int EDIT_ON = 104;
+    int EDIT_OFF = 105;
 
     byte FROM_GALLERY = 1;
     byte FROM_CAMERA = 2;
