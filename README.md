@@ -3,6 +3,7 @@ Dev Intensive
 Данный проект был реализован в рамках учебного курса Dev-Intensive (Skill-branch.ru) от компании SoftDesign.
 Системные требования:
 - Android 4.0+ (API SDK 15+)
+
 Возможности:
 - Вход по паролю на сервер, автоматический вход по токену (Retrofit2, OkHTTP, JSON, REST) 
 - Загрузка сведений пользователя и списка пользователей (Retrofit2, OkHTTP, JSON, REST)  
