@@ -12,6 +12,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -35,14 +36,17 @@ import com.softdesign.devintensive.utils.UiHelper;
 public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHolder>
         implements Filterable, ItemTouchHelperAdapter {
     private static final String TAG = ConstantManager.TAG_PREFIX + "UsersAdapter";
-    Context mContext;
-    List<User> mUsers;
-    List<User> mFilteredUsers;
-    List<User> mRemovalUsers;
-    CustomClickListener mCustomClickListener;
-    UserFilter mFilter;
-    DaoSession mDaoSession;
-    UsersAdapter mUsersAdapter = this;
+    private Context mContext;
+    private List<User> mUsers;
+    private List<User> mFilteredUsers;
+    private List<User> mRemovalUsers;
+    private CustomClickListener mCustomClickListener;
+    private UserFilter mFilter;
+    private DaoSession mDaoSession;
+    private UsersAdapter mUsersAdapter = this;
+
+    public static final int VIEW_TYPE_DEFAULT = 1;
+    public static final int VIEW_TYPE_LOADER = 2;
 
     public UsersAdapter(List<User> users, CustomClickListener customClickListener) {
         mUsers = users;
@@ -59,6 +63,8 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
     @Override
     public UserViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         mContext = parent.getContext();
+
+
         UiHelper.writeLog("onCreateViewHolder");
         View convertView = LayoutInflater.from(mContext).inflate(R.layout.item_user_list, parent, false);
         return new UserViewHolder(convertView, mCustomClickListener);
@@ -238,6 +244,8 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
         private ImageView mLikesImage;
         private boolean isCardLongPressed = false;
 
+
+
         private CustomClickListener mListener;
 
         public UserViewHolder(View itemView, CustomClickListener customClickListener) {
@@ -310,6 +318,14 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
 //                    return true;//блокируем вызов поторных OnLongClick
 //                }
 //            });
+        }
+
+        public ImageView getLikesImage() {
+            return mLikesImage;
+        }
+
+        public TextView getLikesCount() {
+            return mLikesCount;
         }
 
         @Override

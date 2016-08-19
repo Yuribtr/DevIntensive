@@ -85,5 +85,12 @@
     <string name="zero">0</string>
     <string name="likes_count_tv">счетчик лайков</string>
     <string name="my_like_img">мой лайк</string>
-
+    <plurals name="likes_count">
+        <item quantity="zero">нет лайков</item>
+        <item quantity="one">%1$d лайк</item>
+        <item quantity="two">%1$d лайка</item>
+        <item quantity="few">%1$d лайка</item>
+        <item quantity="many">%1$d лайков</item>
+        <item quantity="other">%1$d лайков</item>
+    </plurals>
 </resources>

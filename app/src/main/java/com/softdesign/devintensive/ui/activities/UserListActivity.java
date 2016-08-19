@@ -17,6 +17,7 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -42,8 +43,10 @@ import com.softdesign.devintensive.data.storage.models.User;
 import com.softdesign.devintensive.data.storage.models.UserDTO;
 import com.softdesign.devintensive.ui.adapters.ItemTouchHelperCallback;
 import com.softdesign.devintensive.ui.adapters.UsersAdapter;
+import com.softdesign.devintensive.ui.adapters.UsersItemAnimator;
 import com.softdesign.devintensive.utils.ConstantManager;
 import com.softdesign.devintensive.utils.CustomClickListener;
+import com.softdesign.devintensive.utils.DevintensiveApplication;
 import com.softdesign.devintensive.utils.RecyclerItemClickListener;
 import com.softdesign.devintensive.utils.TransformRoundedImage;
 import com.softdesign.devintensive.utils.UiHelper;
@@ -80,6 +83,7 @@ public class UserListActivity extends BaseActivity {
         mConnector = new ChronosConnector();
         mConnector.onCreate(this, savedInstanceState);
         setContentView(R.layout.activity_user_list);
+        mContext= DevintensiveApplication.getContext();
 
         mDataManager = DataManager.getInstance();
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.main_coordinator_container);
@@ -178,7 +182,11 @@ public class UserListActivity extends BaseActivity {
                                                                  }
                                                                  if (item.getItemId()==R.id.clear_credentials) {
                                                                      mDataManager.getPreferencesManager().clearAuthToken();
-                                                                     showToast(getString(R.string.token_deleted_message));
+                                                                     UiHelper.writeLog(mContext.getString(R.string.token_deleted_message));
+                                                                     //переходим в окно авторизации
+                                                                     Intent authIntent = new Intent(UserListActivity.this, AuthActivity.class);
+                                                                     startActivity(authIntent);
+//                                                                     showToast(getString(R.string.token_deleted_message));
                                                                  }
                                                                  item.setChecked(true);
                                                                  mNavigationDrawer.closeDrawer(GravityCompat.START);
@@ -201,6 +209,9 @@ public class UserListActivity extends BaseActivity {
         UiHelper.writeLog("setupAdapters calling");
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(linearLayoutManager);
+        //// TODO: здесь подключаем анимацию
+        mRecyclerView.setItemAnimator(new UsersItemAnimator());
+        
         ItemTouchHelper.Callback callback = new ItemTouchHelperCallback(mUsersAdapter);
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
         touchHelper.attachToRecyclerView(mRecyclerView);
